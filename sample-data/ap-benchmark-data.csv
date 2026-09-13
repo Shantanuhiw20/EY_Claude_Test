@@ -1,0 +1,9 @@
+metric,unit,leading_practice,average,lagging_practice,note
+Days Payable Outstanding (DPO),days,45-60,30-45,under 30 or over 75,"Too low can mean missed cash optimisation, too high can strain vendor relationships"
+On-time payment rate,percentage,>95%,85-95%,<85%,Below 85% usually signals a process or approval bottleneck
+Invoice exception rate,percentage,<5%,5-15%,>15%,High exception rate is the single strongest predictor of AP rework cost
+Early payment discount capture,percentage,>80%,50-80%,<50%,Directly quantifiable missed savings
+Invoice-to-posting cycle time,days,<2,2-5,>5,Cycle time is separate from payment terms and shows raw process speed
+PO-backed invoice ratio,percentage,>80%,50-80%,<50%,Low PO coverage correlates with higher exception and fraud risk
+"AP FTE per 10,000 invoices/month",count,<3,3-6,>6,"Headcount efficiency benchmark, adjust for automation maturity"
+OCR/automated capture adoption,percentage,>70%,30-70%,<30%,Low adoption is the fastest automation opportunity to flag

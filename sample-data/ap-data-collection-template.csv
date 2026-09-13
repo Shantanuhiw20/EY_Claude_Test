@@ -1,0 +1,17 @@
+field_id,category,question,why_it_matters,data_type
+ap_01,Volume,How many vendor invoices does your team process in a typical month?,Sets the scale of the operation and the automation opportunity,number
+ap_02,Volume,What percentage of invoices are Purchase Order (PO) backed versus non-PO?,Non-PO invoices are far more manual and error-prone,percentage
+ap_03,Process,How many approval steps does an invoice go through before payment?,More steps usually means more delay and more exceptions,number
+ap_04,Process,"Who are the approvers at each step (role, not name)?",Identifies bottleneck roles and single points of failure,text
+ap_05,Technology,"What system do you use for invoice processing (e.g. SAP, Oracle, Coupa, manual/Excel)?",Determines what automation is already possible versus needs new tooling,text
+ap_06,Technology,Do you use OCR or automated data capture for invoices today?,Shows current automation maturity,yes/no
+ap_07,Metric,What is your average Days Payable Outstanding (DPO)?,"Core AP health metric, compared against benchmark",number (days)
+ap_08,Metric,What percentage of invoices are paid on time (before due date or agreed terms)?,Signals process reliability and vendor relationship risk,percentage
+ap_09,Metric,"What percentage of invoices have an exception (mismatch, missing PO, duplicate) needing manual resolution?",Direct proxy for rework and hidden cost,percentage
+ap_10,Metric,What percentage of eligible early-payment discounts are actually captured?,"Missed discounts are a direct, quantifiable cost of a slow process",percentage
+ap_11,Team,How many FTEs work in the AP function today?,Baseline for the capacity/automation conversation,number
+ap_12,Team,What is the average time (in days) from invoice receipt to posting?,"Cycle time, separate from payment timing",number (days)
+ap_13,Vendor,"How many active vendors do you manage, and how concentrated is spend (top 10 vendors as % of total)?",Concentration affects risk and negotiating power,text
+ap_14,Pain point,"What is the single biggest bottleneck in your AP process today, in your own words?","Open-ended, captures tacit knowledge a form cannot",text
+ap_15,Pain point,"Have you had any recent instances of duplicate payment, fraud, or a missed early-payment discount you can describe?","Concrete incidents ground the diagnostic in real cost, not just theory",text
+ap_16,Culture,How does your team currently feel about the workload and pace of month-end close activities related to AP?,"Optional softer signal on team strain, used carefully and never over-interpreted",text
