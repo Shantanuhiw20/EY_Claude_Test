@@ -14,38 +14,86 @@
 
 Claude Code is Anthropic's tool for working with Claude directly on your own computer, instead of in a browser chat window. It can read your files, write files, run commands, and hold a conversation with you about your actual work.
 
-You start it from the terminal, the window where you type instructions to your computer as text. You will type three lines there today. After that, you talk to Claude in plain English and it handles the rest.
+You will type one word today to start it: `claude`. After that, you talk to Claude in plain English and it handles the rest.
 
 You can copy the commands and paste them, but read what you're pasting. That's where the learning is.
 
 ---
 
-## Step 1: Open your terminal
+## The two tools you'll use
 
-- **Windows:** click Start, type `powershell`, press Enter.
-- **Mac:** press Command + Space, type `terminal`, press Enter.
+- **Visual Studio Code** (we'll call it **VS Code**): a free app where you'll do all your work for two days. Think of it as the room you work in.
+- **Claude Code**: the AI. You start it by typing `claude` once inside VS Code, then you talk to it in plain English.
 
-A window opens with some text in it. Leave it open.
+That's the whole setup. One room, one assistant.
 
 ---
 
-## Step 2: Get the project folder and start Claude
+## Step 1: Clone the bootcamp materials in VS Code
 
-Everything you build over the two days lives in a project folder called `thecrux-ey-bootcamp`. You get it the way any real project starts: by cloning it from GitHub.
+Instead of making a folder and downloading files by hand, you'll let VS Code fetch everything in one go. It creates the folder, pulls in all the files, and opens it for you. This is the same on Windows and Mac.
 
-**Windows PowerShell or Mac Terminal, same commands:**
+1. Open **Visual Studio Code**. It opens on the **Welcome** tab. (If you don't see it, open **Help -> Welcome**.)
+2. On the Welcome screen, under **Start**, click **Clone Git Repository...**
+3. A box drops down from the top of the window. Paste this in and press **Enter**:
 
 ```
-git clone https://github.com/thecrux-ai/thecrux-ey-bootcamp.git
-cd thecrux-ey-bootcamp
+https://github.com/thecrux-ai/thecrux-ey-bootcamp
+```
+
+4. A dialog opens asking where to put it. It's already pointing at your **home folder**, that's fine, don't change it. Click **Select as Repository Destination** to accept.
+5. Look at the **bottom-right corner** of VS Code. You'll see a small **cloning** progress message. It takes a few seconds.
+6. When it finishes, a message pops up: *"Would you like to open the cloned repository?"* Click **Open**. This opens it right here in the same window.
+7. If VS Code asks *"Do you trust the authors of the files in this folder?"*, click **Yes, I trust the authors**. These are your own course files.
+
+> **Don't see "Clone Git Repository" on the Welcome screen?** Open the Command Palette (**View -> Command Palette**, or `Cmd/Ctrl + Shift + P`), type `Git: Clone`, press **Enter**, and carry on from step 3. It's the same thing.
+
+---
+
+## Step 2: Confirm the files are there
+
+Look at the left panel in VS Code (the **Explorer**). The folder `THECRUX-EY-BOOTCAMP` is now open, with all the session files inside:
+
+```
+THECRUX-EY-BOOTCAMP
+├── session-0-hello-claude.md   <- this file
+├── session-1-claude-md.md
+├── session-2-skills.md
+├── session-3-connectors-brief.md
+├── session-4-research-agents.md
+├── session-5-builds.md
+└── ...
+```
+
+That's everything for the two days, sitting on your machine, and VS Code is already pointed at the right folder.
+
+> If the files didn't appear, or the clone reported an error, ask the facilitator. It's usually sorted in under a minute.
+
+---
+
+## Step 3: Open a terminal and start Claude
+
+A **terminal** is a small panel at the bottom of VS Code. You'll only type one word into it to get going.
+
+1. From the top menu, choose **Terminal -> New Terminal**. A panel opens along the bottom of VS Code.
+2. Because VS Code already has the bootcamp folder open, this terminal starts **inside** it, exactly where you want to be.
+3. Click inside the panel, type the word below, and press **Enter**:
+
+```
 claude
 ```
 
-Line one copies the project folder from GitHub onto your laptop. Line two moves you into it. Line three starts Claude Code.
+Claude Code starts up. You'll see something like a `>` prompt on a new line. That's Claude waiting for your message.
+
+> **This is the only thing you ever type into the terminal to start Claude: `claude`.** Everything from here on is plain English typed at the `>` prompt, or menu clicks in VS Code.
+
+> **How to tell it's in the right place:** ask Claude `What folder are you in right now?` It should name the `thecrux-ey-bootcamp` folder. That means it can see all the session files.
+
+> **Mac/Windows note:** before you type `claude`, the terminal prompt might end in a `%` or `$`, or start with `PS`. That's all normal. Just type `claude` after it.
 
 ---
 
-## Step 3: Confirm the workshop login
+## Step 4: Confirm the workshop login
 
 You're signed in with the workshop login already set up on this laptop. Stay on that login, not a personal account.
 
@@ -55,7 +103,7 @@ If you instead see a screen asking for an email or password, stop and ask the fa
 
 ---
 
-## Step 4: Your first prompt
+## Step 5: Your first prompt
 
 Type this into Claude:
 
@@ -116,9 +164,10 @@ By the end of Day 2 you will have a working Claude Code build you deployed yours
 
 | Issue | What's happening | Fix |
 | --- | --- | --- |
-| `git clone` fails with "repository not found" or asks for a username and password | The repo address is wrong, or the repo needs a sign-in | Ask the facilitator for the correct URL or access. |
-| `git` says "command not found" | Git isn't set up on this laptop | Ask the facilitator. Don't install it yourself on this machine. |
-| `claude` says "command not found" | The terminal opened before setup finished | Close the terminal, open it fresh, run `claude` again. If it still fails, ask the facilitator. |
+| The clone fails, or asks for a username and password | The repo address is wrong, or the repo needs a sign-in | Ask the facilitator for the correct URL or access. |
+| "Clone Git Repository..." isn't on the Welcome screen | The Welcome tab may be closed | Open the Command Palette (`Cmd/Ctrl + Shift + P`), type `Git: Clone`, press Enter, and carry on from Step 1. |
+| VS Code doesn't offer to open the cloned repository | Sometimes the pop-up is missed | Open it yourself: **File -> Open Folder...**, pick `thecrux-ey-bootcamp`. |
+| `claude` says "command not found" | The terminal opened before setup finished | Close the terminal panel, open a fresh one (**Terminal -> New Terminal**), run `claude` again. If it still fails, ask the facilitator. |
 | Claude opens and asks me to log in | The workshop login on this laptop wasn't applied | Do not sign in with a personal email. Ask the facilitator. |
 | I'm not sure if this is the workshop account or a personal one | Hard to tell from the banner alone | Check with the facilitator before doing anything else. |
 | Claude seems stuck or confused | It happens | Press `Escape` to stop it. If it's still odd, `/clear` for a fresh conversation. |

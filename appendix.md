@@ -5,7 +5,7 @@ The common problems and the fix for each. Each session file also has its own tro
 ## Claude Code won't start
 
 **`claude` is not recognized**
-- Close the terminal. Open it again. Run the three lines from Session 0 once more.
+- Close the terminal panel in VS Code, open a fresh one (**Terminal -> New Terminal**), run `claude` again.
 - Still failing? Ask the facilitator.
 
 **Nothing happens after `claude`**
@@ -16,7 +16,7 @@ The common problems and the fix for each. Each session file also has its own tro
 
 **`/interview-me` or `/build-persona` not recognised**
 - Claude Code needs to be started from inside `thecrux-ey-bootcamp`. Both commands live in `.claude/commands/`.
-- Exit Claude Code, run the lines from Session 0 again, and retry.
+- Exit Claude Code, check VS Code has the `thecrux-ey-bootcamp` folder open, run `claude` again, and retry.
 
 **Claude keeps asking permission for everything**
 - That is normal and safe. Stay in the default mode. If the same safe action keeps coming up (say, reading files), use `/permissions` to allow just that action. Avoid accept-edits mode while you are still learning the tool.

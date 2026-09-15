@@ -70,13 +70,13 @@ You do **not** need an API key of your own. While you build on Day 2 the app run
 
 ## Your Project Folder
 
-Open your terminal and run these three lines. Session 0 walks you through it.
+In VS Code, clone `https://github.com/thecrux-ai/thecrux-ey-bootcamp`, then open a terminal inside it and run:
 
 ```
-git clone https://github.com/thecrux-ai/thecrux-ey-bootcamp.git
-cd thecrux-ey-bootcamp
 claude
 ```
+
+Session 0 walks you through it, click by click.
 
 On Day 2 you push the code you build to your own GitHub repo and deploy it on Vercel. Claude Code does that for you when you ask.
 
