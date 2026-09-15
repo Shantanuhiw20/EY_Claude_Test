@@ -223,20 +223,30 @@ You've now confirmed the persona, four skills, the reviewer agent, and three sam
 
 ## Step A2: Scaffold the Next.js app
 
-Three short prompts rather than one long one. Run them in order and check the result of each before moving on, so if something goes wrong you know exactly which step it was.
+Four short prompts rather than one long one. Run them in order and check the result of each before moving on, so if something goes wrong you know exactly which step it was.
+
+### The env file, first
+
+```
+Touch a .env.local file inside ey-fin-os/ containing:
+
+AI_PROVIDER=claude-cli
+```
+
+Doing this before the scaffolding tool touches the folder means the app can never start without it, and if something goes wrong at this step, you find out before you've scaffolded a whole app on top of it.
 
 ### The app itself
 
 ```
 Scaffold a Next.js app in this project (App Router, TypeScript), inside
 ey-fin-os/. Do not initialize git. If the scaffolding tool offers to,
-decline.
+decline. Keep the .env.local file that is already there, do not
+overwrite or remove it.
 
 Install the Vercel AI SDK (ai), its OpenAI-compatible provider package
 (@ai-sdk/openai), and @ai-sdk/react.
 
-Add a .env.local file containing AI_PROVIDER=claude-cli, and make sure
-.env.local is listed in .gitignore.
+Make sure .env.local is listed in .gitignore.
 
 Then start the app and tell me the URL.
 ```
