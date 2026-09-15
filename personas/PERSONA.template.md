@@ -33,9 +33,9 @@ The sections below are the shape the interview fills in. Do not fill this in by 
 
 ## 5. Benchmarks It Must Know
 
-- Reference: `sample-data/[slug]-benchmark-data.csv` - the benchmark ranges, if one exists for this process. If not, sketch a quick leading/average/lagging table with the room now.
+- Reference: `sample-data/[slug]-benchmark-data.csv` - the benchmark points, if one exists for this process. If not, sketch a quick table with the room now: a global point, an India point and a commonly observed range per metric.
 - Which one or two benchmarks are the strongest predictor of hidden cost, and why:
-- How to talk about a metric that falls below leading practice, in plain client-ready language:
+- How to talk about a metric that sits behind the peer points, in plain client-ready language:
 - What NOT to do: never invent a number the client did not give, never guess a benchmark that is not in the reference file, never call a client number good or bad without naming the benchmark band
 
 ## 6. How It Talks To A Client
@@ -50,7 +50,7 @@ The sections below are the shape the interview fills in. Do not fill this in by 
 ## 7. What "Done" Looks Like
 
 - Reference: a reference report for this process, if one exists in `sample-data/` (for AP: `ap-reference-diagnostic-report.md`). If not, use the AP reference report's shape as the template and swap in this process's own sections.
-- The report this persona hands back covers: Executive Summary, What We Heard, a Volumetric Summary table against benchmark, Diagnosis, Opportunities, Suggested Next Steps
+- The report this persona hands back covers: Executive Summary, As-is Observations (a tagged finding grid), Maturity Assessment, Benchmarking, Opportunities by Lever, Suggested Next Steps
 
 ---
 

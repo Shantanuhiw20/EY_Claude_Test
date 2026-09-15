@@ -55,7 +55,7 @@ A skill in this project's `.claude/skills/` folder works in this project only, w
 
 ### A skill is not CLAUDE.md
 
-`CLAUDE.md` is standing context. It loads in every session, on its own, and it holds what is always true: who you are, and the house rules for how you want Claude to work with you. A skill is a recipe for one task. It loads when you call it, or when its description fits, does the job, and gets out of the way. Put a rule in `CLAUDE.md` when it should shape everything. Put it in a skill when it belongs to one job. Session 3 adds a third thing, an agent: a skill given a job title, a point of view, and its own separate conversation to work in.
+`CLAUDE.md` is standing context. It loads in every session, on its own, and it holds what is always true: who you are, and the house rules for how you want Claude to work with you. A skill is a recipe for one task. It loads when you call it, or when its description fits, does the job, and gets out of the way. Put a rule in `CLAUDE.md` when it should shape everything. Put it in a skill when it belongs to one job. Session 4 adds a third thing, an agent: a skill given a job title, a point of view, and its own separate conversation to work in.
 
 ### Skills can be found, not only written
 
@@ -78,7 +78,7 @@ You will not write these files by hand. You describe what you want, Claude write
 
 **Outcome:** given a conversation with an AP client (even a partial one), the skill tells you which required fields are answered, which are missing, and drafts the next question to ask. This is the exact logic that will sit behind tomorrow's chatbot and stop it from writing a report on half the facts.
 
-The checklist it works from is at `sample-data/ap-data-collection-template.csv`. Open it and look at the columns: `field_id`, `category`, `question`, `why_it_matters`, `data_type`. Sixteen fields, covering volume, process, technology, the core metrics, team size, vendor concentration, pain points, and team culture.
+The checklist it works from is at `sample-data/ap-data-collection-template.csv`. Open it and look at the columns: `field_id`, `category`, `question`, `why_it_matters`, `data_type`. Twenty fields across eight categories: vendor master, invoice processing, payments, reconciliation, query and dispute, compliance, team, and an open pain-point question.
 
 ```
 Build a skill called "data-checklist" at .claude/skills/data-checklist/SKILL.md
@@ -86,7 +86,7 @@ Build a skill called "data-checklist" at .claude/skills/data-checklist/SKILL.md
 It takes a conversation transcript (pasted in, or a file path) and checks it
 against the checklist at sample-data/ap-data-collection-template.csv.
 
-For each of the 16 fields in that file, it should:
+For each of the 20 fields in that file, it should:
 - Mark it ANSWERED if the transcript covers it, and quote the line that
   answers it.
 - Mark it MISSING if the transcript does not cover it.
@@ -120,15 +120,15 @@ a lot still come in as email PDFs someone has to key in by hand.
 
 Check the output. Does it correctly mark volume, PO-backed ratio, technology, and OCR adoption as ANSWERED, and everything else (DPO, on-time rate, exception rate, discount capture, FTEs, cycle time, vendor concentration, approval steps, pain point) as MISSING? Are the next questions it drafts pulled straight from the checklist, not invented? If not, tell Claude what is off and have it fix `SKILL.md`.
 
-**Why this matters for tomorrow:** tomorrow's chatbot cannot ask all 16 questions in one breath, and it cannot write a report with half the fields blank. This skill is that exact discipline, built and tested today.
+**Why this matters for tomorrow:** tomorrow's chatbot cannot ask all 20 questions in one breath, and it cannot write a report with half the fields blank. This skill is that exact discipline, built and tested today.
 
 ---
 
 ## Skill 2: `/benchmark-interpreter` - turn a number into a read
 
-**Outcome:** given a metric name and a value, the skill tells you in plain English whether that number is leading practice, average, or lagging practice, with a one-line reason. This becomes the benchmark-comparison logic inside tomorrow's report.
+**Outcome:** given a metric name and a value, the skill places it against the global and India peer points, states the unit, and says in plain English what that position actually means. This becomes the benchmark-comparison logic inside tomorrow's report.
 
-The benchmark table is at `sample-data/ap-benchmark-data.csv`. Columns: `metric`, `unit`, `leading_practice`, `average`, `lagging_practice`, `note`.
+The benchmark table is at `sample-data/ap-benchmark-data.csv`. Columns: `field_id`, `metric`, `unit`, `global_benchmark`, `india_benchmark`, `commonly_observed`, `read`.
 
 ```
 Build a skill called "benchmark-interpreter" at
@@ -138,17 +138,19 @@ It takes a metric name and a value (for example: "Days Payable Outstanding
 = 38 days") and looks it up in sample-data/ap-benchmark-data.csv.
 
 It should return:
-1. The read: LEADING PRACTICE, AVERAGE, or LAGGING PRACTICE.
-2. One line, plain English, on why that value lands where it does. Use
-   the "note" column from the benchmark file as context, not verbatim.
-3. The exact range it was compared against, so the client can see the
-   working, not just the verdict.
+1. The three comparison points with the unit: global, India, and the
+   client's value.
+2. Position, stated as a fact: ahead of, near, or behind the India point.
+3. One line, plain English, on what that position actually means. Use the
+   "read" column from the benchmark file as context, not verbatim.
 
 Rules the skill must enforce:
 - If the metric name does not match anything in the benchmark file
-  (even close variants), say so plainly instead of guessing a verdict.
-- Never soften a lagging-practice result. State it plainly, then explain
-  why it matters, in one sentence.
+  (even close variants), say so plainly instead of guessing.
+- Never report a number without its unit.
+- Some metrics are meaningless alone. DPO read without paid-on-time,
+  or exception rate read without PO coverage, tells you nothing. Say
+  "this needs X to interpret" rather than giving a false read.
 - No jargon. This gets read by a client's finance team, not a data analyst.
 
 Use proper YAML frontmatter (name, description) and a markdown body.
@@ -159,12 +161,12 @@ Test it with three numbers from a real-shaped conversation:
 ```
 /benchmark-interpreter on these:
 
-1. Days Payable Outstanding = 38 days
+1. Days Payable Outstanding = 58 days
 2. Invoice exception rate = 18%
-3. Early payment discount capture = 32%
+3. PO-backed invoices = 62%
 ```
 
-Check the output. Does DPO come back as within the healthy range? Does the exception rate come back as lagging, with a reason that matches the note in the benchmark file (exception rate is the strongest predictor of AP rework cost)? Does discount capture come back as lagging too? If the verdicts or the reasoning feel off, correct the skill once.
+Check the output. Does DPO come back with all three points and the unit, and does it flag that it cannot be read without paid-on-time? Does the exception rate come back as well behind the India point of 8%? Does PO coverage at 62% get called out as the likely root cause of that exception rate? If the reads or the reasoning feel off, correct the skill once.
 
 **Why this matters for tomorrow:** every number in tomorrow's report needs this same read next to it. Building it as a skill today means the build session tomorrow calls it, instead of explaining benchmark logic from scratch under time pressure.
 
@@ -174,7 +176,9 @@ Check the output. Does DPO come back as within the healthy range? Does the excep
 
 **Outcome:** given a set of structured notes or answers, the skill produces a full diagnostic write-up in one fixed shape, every time. This becomes tomorrow's report generator.
 
-The target shape is at `sample-data/ap-reference-diagnostic-report.md`. Open it now. Notice the headings: Executive Summary, What We Heard, Volumetric Summary (a table), Diagnosis, Opportunities, Suggested Next Steps. That shape does not change. Only the content inside it does.
+The target shape is at `sample-data/ap-reference-diagnostic-report.md`. Open it now. Notice the headings: Executive Summary, As-is Observations (a table), Maturity Assessment, Benchmarking, Opportunities by Lever, Suggested Next Steps. That shape does not change. Only the content inside it does.
+
+Look closely at the As-is Observations grid. Every row pairs an observation with an opportunity, and carries four tags: Impact, Ease, Dimension and Timeframe. That pairing is the whole discipline. A finding with no recommendation is just a complaint.
 
 ```
 Build a skill called "template-filler" at .claude/skills/template-filler/SKILL.md
@@ -183,23 +187,34 @@ It takes structured notes (answers to the AP data checklist, plus any
 benchmark reads) and produces a diagnostic report in exactly this shape,
 matching sample-data/ap-reference-diagnostic-report.md:
 
-1. EXECUTIVE SUMMARY. 3 to 5 lines. The headline finding, in plain
-   language, including the one or two numbers that matter most.
-2. WHAT WE HEARD. The themes that came up in the conversation, as bullets,
-   in the client's own language where possible.
-3. VOLUMETRIC SUMMARY. A markdown table: metric, the client's number,
-   leading practice, average, and a one-word read (healthy / average /
-   below average).
-4. DIAGNOSIS. 1 to 2 short paragraphs on what the pattern of numbers and
-   themes actually means, not just a restatement of the numbers.
-5. OPPORTUNITIES. Numbered list, 2 to 4 items, each one specific and
-   tied to a number from the notes.
-6. SUGGESTED NEXT STEPS. Short bullet list, concrete and near-term.
+1. EXECUTIVE SUMMARY. 3 to 5 lines, leading with the causal chain rather
+   than a list of findings. Most AP problems chain: low PO coverage
+   produces exceptions, exceptions produce cycle time, cycle time
+   produces late payment. Find that chain and open with it.
+2. AS-IS OBSERVATIONS. A markdown table, one row per finding: ID,
+   sub-process, as-is observation, improvement opportunity, and
+   implementation considerations. IDs run AP01, AP02 in sequence. Every
+   row carries four tags in the considerations cell: Impact
+   (High/Medium/Low), Ease (High/Medium/Low), Dimension
+   (Process/People/Technology) and Timeframe (0-3, 3-6, 6-12, 12+ months).
+3. MATURITY ASSESSMENT. A table, one row per sub-process, with current
+   and 12-month target on five bands: Basic, Developing, Defined,
+   Advanced, Leading, plus the basis for the band in one line.
+4. BENCHMARKING. A markdown table: metric, unit, global, India, client,
+   and a one-line read.
+5. OPPORTUNITIES BY LEVER. Grouped under Standardisation, Optimization,
+   Technology, and People and controls. Reference the finding IDs rather
+   than restating them.
+6. SUGGESTED NEXT STEPS. Sequenced, and ending with what was not
+   established during the interview.
 
 Rules the skill must enforce:
 - Never invent a number, a quote, or a client detail that was not in the
   notes it was given. If something needed for the report is missing,
   flag it in {curly braces} instead of making it up.
+- Never an observation without a paired improvement opportunity.
+- Ease is about the organisation, not the size of the edit. A policy
+  change needing procurement sign-off is not Ease High.
 - Keep the headings and their order exactly as above. Do not add or
   rename sections.
 - Tone: plain, confident, the way a senior consultant writes for a CFO,
@@ -219,13 +234,14 @@ Approval chain has 5 steps for anything over Rs 50,000, two approvers
 are frequently unavailable. Team knows discounts are being missed but
 has no visibility into vendor terms.
 
-Metrics: DPO 38 days (healthy, leading practice 45-60, average 30-45).
-On-time payment rate 89% (average, leading practice above 95%).
-Exception rate 18% (below average, leading practice under 5%).
-Early discount capture 32% (below average, leading practice above 80%).
+Metrics: PO-backed invoices 60% (global 95, India 85).
+Exception rate 18% (global 2, India 8).
+Paid on time 41% (global 95, India 70).
+DPO 58 days (global 45, India 55).
+Early discount capture 32% (global 85, India 45).
 ```
 
-Compare the output against `sample-data/ap-reference-diagnostic-report.md`. Same six sections, same order? Table formatted properly? Nothing invented that was not in the notes? If a section is missing or a number looks made up, push back once and have Claude tighten the skill.
+Compare the output against `sample-data/ap-reference-diagnostic-report.md`. Same six sections, same order? Is every finding tagged and paired with an opportunity? Nothing invented that was not in the notes? If a section is missing or a number looks made up, push back once and have Claude tighten the skill.
 
 **Why this matters for tomorrow:** this is, almost word for word, the report generator tomorrow's build wires up at the end of the chatbot. You are not practising for that step. You are building it.
 
@@ -311,4 +327,4 @@ conversation.
 
 ---
 
-**Next:** [Session 3: Agents →](session-3-research-agents.md)
+**Next:** [Session 3: Connectors + Daily Brief →](session-3-connectors-brief.md)

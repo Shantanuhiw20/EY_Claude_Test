@@ -15,6 +15,6 @@ A persona is not the same thing as `CLAUDE.md`. `CLAUDE.md` (built in Session 1 
 
 Run `/build-persona` any time, in this bootcamp or after it. It asks which process you are building for, interviews you the same way Session 1 did for AP, and saves a new file here. It never touches `CLAUDE.md` or any other persona file. This is how the Hackathon works, and how you would add a fifth or sixth persona for EY after the workshop ends.
 
-**A new persona here is invisible to the app until you sync it.** From Session 4 onwards the app reads `ey-fin-os/context/personas/`, not this folder. After `/build-persona` saves a file here, run `npm run sync-context` inside `ey-fin-os` to copy it across. Skipping that is the most common reason the chat carries on asking the old process's questions.
+**A new persona here is invisible to the app until you sync it.** From Session 5 onwards the app reads `ey-fin-os/context/personas/`, not this folder. After `/build-persona` saves a file here, run `npm run sync-context` inside `ey-fin-os` to copy it across. Skipping that is the most common reason the chat carries on asking the old process's questions.
 
 See `PERSONA.template.md` for the shape every persona file follows.

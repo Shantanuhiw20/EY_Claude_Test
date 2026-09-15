@@ -2,7 +2,7 @@
 
 ---
 
-# Session 4: The Guided Build - AP Diagnostic Chatbot
+# Session 5: The Guided Build - AP Diagnostic Chatbot
 
 **Day 2 - the flagship build, first thing in the morning.** We do this one together, step by step, the whole room at the same pace.
 
@@ -21,7 +21,7 @@ Look at what's behind you from yesterday:
 - A **benchmark-interpreter skill**: the logic for turning a raw number like "18% exception rate" into a judgement like "below average." That becomes this agent's analysis.
 - A **template-filler skill**: the logic for taking messy inputs and pouring them into a fixed report shape. That becomes this agent's report generator.
 - A **file-reader skill**: reading an email, a CSV, or a screenshot and pulling out the checklist answers hiding in it. That becomes this agent's upload handling.
-- A **Reviewer agent** (`.claude/agents/reviewer.md`), built yesterday to close Day 1. It read a draft report or a question set the way a sceptical CFO would, and sharpened your sixteen diagnostic questions into `ap-data-collection-template-v2.csv`. Today it comes back once, at the end, for an optional last look at the generated report.
+- A **Reviewer agent** (`.claude/agents/reviewer.md`), built yesterday to close Day 1. It read a draft report or a question set the way a sceptical CFO would, and sharpened your twenty diagnostic questions into `ap-data-collection-template-v2.csv`. Today it comes back once, at the end, for an optional last look at the generated report.
 
 Every part you built yesterday has a job in today's build. We are not starting from zero, we are assembling.
 
@@ -37,7 +37,7 @@ Nothing gets retyped. Your Day 1 files stay exactly where they are, and one comm
 - Every interview is saved to a database and has its own link. The client can close the tab and reopen that link later, and the conversation carries on where it stopped.
 - The agent writes each answer down as it hears it, so a progress bar shows real progress and the report gets clean numbers instead of a transcript to mine.
 - The agent keeps interviewing until it has enough, then offers to generate the report.
-- A second page in the app shows the finished diagnostic report: Executive Summary, What We Heard, a Volumetric Summary table against benchmarks, Diagnosis, Opportunities, Suggested Next Steps.
+- A second page in the app shows the finished diagnostic report: Executive Summary, As-is Observations (a tagged finding grid), Maturity Assessment, Benchmarking, Opportunities by Lever, Suggested Next Steps.
 - A real Vercel URL, live, that anyone in the room could open on their phone.
 
 ---
@@ -169,7 +169,7 @@ Do not be put off by the word "Legacy" on that tab. Supabase has newer publishab
 
 Step 11 catches people out. Supabase shows the URL with a path on the end, and pasting the whole thing gives you a broken `SUPABASE_URL`. Every save then fails, and the error you get back does not mention the URL at all, so it is a slow one to spot. Trim it to `.co`.
 
-Keep both somewhere you can paste from later. You will use them in Part B, and again on Vercel in Part D.
+Keep both somewhere you can paste from later. You will use them in Part A, and again on Vercel in Part D.
 
 That `service_role` key is a master key for your database. It bypasses every access rule, including the row level security you just turned on. It goes in `.env.local` and later into Vercel, and nowhere else. Never paste it into the chat with Claude, never commit it, never put it in front-end code.
 
@@ -194,7 +194,7 @@ I built an AP persona file yesterday (Day 1, Session 1) at
 personas/ap-persona.md, four skills (Day 1, Session 2):
 data-checklist, benchmark-interpreter, template-filler, and file-reader,
 each in its own folder under .claude/skills/ with a SKILL.md, and one
-agent (Day 1, Session 3) at .claude/agents/reviewer.md.
+agent (Day 1, Session 4) at .claude/agents/reviewer.md.
 
 Find all of these files and show me their paths and a one-line description
 of each, so I can confirm they're the right ones before we use them. Don't
@@ -217,7 +217,7 @@ checklist. If it doesn't, the app reads the original
 ap-data-collection-template.csv unchanged. Tell me which one you found.
 ```
 
-The `-v2` file is the one the Reviewer agent produced yesterday in Session 3, after critiquing your sixteen diagnostic questions. If it exists, those sharpened questions are what the agent will actually ask from. If it doesn't, nothing breaks and the original is used.
+The `-v2` file is the one the Reviewer agent produced yesterday in Session 4, after critiquing your twenty diagnostic questions. If it exists, those sharpened questions are what the agent will actually ask from. If it doesn't, nothing breaks and the original is used.
 
 You've now confirmed the persona, four skills, the reviewer agent, and three sample-data files all exist at the project root. That's the set the app copies in next, and what it reads for the rest of today.
 
@@ -434,12 +434,12 @@ This step also changes the shape of the app. Instead of one chat page, every int
 
 Your three tables already exist. You created them in Supabase before Part A. This step just connects the app to them.
 
-Paste the Project URL and the `service_role` key from your Supabase project into `.env.local` yourself. Do not paste them into the chat.
+Copy the Project URL and the `service_role` key from your Supabase project into `.env.local` yourself, the same two values from Part A. Do not paste them into the chat.
 
 If you skipped the Supabase setup, go back and do it now. Nothing below works without those tables.
 
 ```
-Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to .env.local. The app
+Use SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from .env.local. The app
 must talk to Supabase only from server-side API routes using the service
 role key, and that key must never reach the browser.
 
@@ -678,7 +678,8 @@ The instructions for that call are assembled from files in this app's own
 context folder: context/personas/ap-persona.md (the domain expertise),
 context/skills/benchmark-interpreter/SKILL.md (benchmark every metric,
 never call a number good or bad without naming the band), and
-context/skills/template-filler/SKILL.md (the six-section shape, never
+context/skills/template-filler/SKILL.md (the six-section shape and the
+finding grid, never
 invent a number, flag gaps in curly braces).
 
 In that call, also give Claude:
@@ -689,16 +690,24 @@ In that call, also give Claude:
   words.
 - The raw content of any uploaded files.
 - context/sample-data/ap-benchmark-data.csv, so it can compare what it
-  heard against leading practice, average, and lagging practice for each
-  metric.
+  heard against the global and India peer points for each metric.
 - context/sample-data/ap-reference-diagnostic-report.md as the exact
   shape to follow: same headings, same tone, same way the benchmark table
   and the narrative sit together.
 
 The report must have these sections, in this order: Executive Summary,
-What We Heard, Volumetric Summary (a table comparing the client's numbers
-to leading practice, average, and lagging practice, with a plain-English
-read for each row), Diagnosis, Opportunities, Suggested Next Steps.
+As-is Observations, Maturity Assessment, Benchmarking, Opportunities by
+Lever, Suggested Next Steps.
+
+As-is Observations is a table, and it is the core of the report. One row
+per finding: ID, Sub-process, As-is observation, Improvement opportunity,
+Implementation considerations. IDs run AP01, AP02 and so on in sequence.
+Every row is tagged with Impact (High/Medium/Low), Ease (High/Medium/Low),
+Dimension (Process/People/Technology) and Timeframe (0-3, 3-6, 6-12 or
+12+ months). Never an observation without a paired opportunity.
+
+Benchmarking gives three points per metric, global, India and client,
+with the unit stated.
 
 Use only numbers that actually came up in the conversation or an
 uploaded file. Where a number was never established, say so plainly
@@ -712,7 +721,8 @@ Return the report as markdown.
 ```
 Build a /report page. When the report is generated, take the user to this
 page and render the markdown cleanly: proper headings, a real table for
-the Volumetric Summary (not a wall of text), readable line length. Keep
+the As-is Observations grid and the Benchmarking table (not a wall of
+text), readable line length. Keep
 it professional, this should look like something you'd actually send to
 a client, or close to it.
 
@@ -722,33 +732,33 @@ questions and regenerate later.
 
 ## Step C3: Test it against the reference shape
 
-Open `sample-data/ap-reference-diagnostic-report.md` side by side with your generated report. Same six sections? Same kind of table? Does the Diagnosis section actually explain the pattern in the numbers, not just repeat them?
+Open `sample-data/ap-reference-diagnostic-report.md` side by side with your generated report. Same six sections? Is every finding tagged, and does every observation have a paired opportunity? Does the Executive Summary explain the causal chain in the numbers, not just restate them?
 
 If the report is thin or generic:
 
 ```
-The Diagnosis section just restates the numbers, it doesn't explain the
+The Executive Summary just restates the numbers, it doesn't explain the
 pattern behind them. Look at how
-context/sample-data/ap-reference-diagnostic-report.md does this: it connects the
-exception rate and cycle time back to one root cause (non-PO invoices),
-instead of listing facts. Rewrite Diagnosis to do the same kind of
-connecting, using what actually came up in this conversation.
+context/sample-data/ap-reference-diagnostic-report.md does this: it
+traces low PO coverage through to exceptions, cycle time and late
+payment as one chain, instead of listing facts. Rewrite the Executive
+Summary to do the same kind of connecting, using what actually came up
+in this conversation.
 ```
 
 If the benchmark table doesn't read right:
 
 ```
-The Volumetric Summary table is missing the benchmark comparison columns
-Leading Practice and Average, and the plain-English read for each row.
-Pull those directly from context/sample-data/ap-benchmark-data.csv and
-add them.
+The Benchmarking table is missing the global and India comparison points
+and the read for each row. Pull those directly from
+context/sample-data/ap-benchmark-data.csv, and state the unit per row.
 ```
 
 Run through the whole thing once more, start to finish: fresh interview, a couple of answers, one file upload, generate report, check it. That's the full loop your live audience will see later.
 
 ## Step C4 (optional): The Reviewer gets the last look
 
-Yesterday the Reviewer critiqued the reference report, then the sixteen diagnostic questions. Give it the same job here, on every report the app generates, before anyone sees it. One prompt:
+Yesterday the Reviewer critiqued the reference report, then the twenty diagnostic questions. Give it the same job here, on every report the app generates, before anyone sees it. One prompt:
 
 ```
 Add a review pass to report generation. After the report is written and
@@ -769,8 +779,9 @@ If time is short, skip this and move to deploy. It is a nice-to-have in the app.
 > - [ ] "Generate Report" is disabled early on, and unlocks once ten answers are recorded
 > - [ ] Clicking it produces a report on `/report`
 > - [ ] All six sections are present, in the right order
-> - [ ] The Volumetric Summary table compares real numbers to the benchmark data
-> - [ ] The Diagnosis section explains a pattern, not just a list of facts
+> - [ ] Every finding is tagged with Impact, Ease, Dimension and Timeframe, and finding IDs run in sequence
+> - [ ] The Benchmarking table gives global, India and client for each metric, with units
+> - [ ] The Executive Summary explains the causal chain, not just a list of facts
 > - [ ] Every number in the report actually came from the conversation or an upload, nothing invented
 > - [ ] (Optional) The Reviewer's notes appear under the report
 >
@@ -894,7 +905,7 @@ You just built one persona end to end: Accounts Payable. Same pattern, same shap
 
 ---
 
-## Troubleshooting - Session 4
+## Troubleshooting - Session 5
 
 Work top to bottom. Most problems are one of these.
 
@@ -963,7 +974,7 @@ While you are building locally the app shells out to `claude -p`. These are the 
 | --- | --- |
 | The report is missing a section, or sections are in the wrong order | Point Claude back at the six required sections and the order, and at `context/sample-data/ap-reference-diagnostic-report.md` as the exact shape to match. |
 | The report invents numbers that were never mentioned | Say: `Some of these numbers were never established in the conversation or an upload. Only use figures that actually came up, and say plainly where something wasn't established, don't estimate.` |
-| The Volumetric Summary table has no benchmark comparison | Say: `Pull the Leading Practice and Average columns from context/sample-data/ap-benchmark-data.csv for each metric in the table.` |
+| The Benchmarking table has no comparison points | Say: `Pull the global_benchmark and india_benchmark columns from context/sample-data/ap-benchmark-data.csv for each metric, and state the unit on every row.` |
 | The whole report reads generic, could be about any company | Say: `This report doesn't sound specific to this conversation, it reads like it could be about anyone. Pull in the actual details this client mentioned, the specific pain point in their own words, the specific vendor or process names if any came up.` |
 
 ### GitHub push and Vercel deploy

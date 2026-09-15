@@ -34,6 +34,11 @@ STEP 0. WHICH PROCESS.
       3, 4, 5, and 7 below, don't ask extra questions for the sake of it.
       Say plainly, once, which of the three files already exist for this
       process, so the room knows what's being reused versus built fresh.
+      That announcement to the room is a one-time courtesy, it is not a
+      substitute for checking again. Sections 3, 4, 5, and 7 each re-check
+      the relevant file for themselves before asking the room anything,
+      regardless of what was said here. Do not carry this Step 0 check
+      forward from memory once several sections have passed.
     - Check whether `personas/[slug]-persona.md` already exists. If it
       does, say a version already exists, list which sections look filled,
       and ask "Resume and refine it, or start fresh?" On "start fresh",
@@ -89,40 +94,58 @@ L4. INTERVIEW SECTIONS 2 TO 7.
           up that the headline metric alone would not reveal
 
       Section 3. Vocabulary and Volumetrics
-        - If `sample-data/[slug]-benchmark-data.csv` exists, pull the core
-          terms and typical ranges straight from it and show them as
-          bullets. Do not ask the room to name terms that are already on
-          file. Only ask about anything the file doesn't cover.
+        - BEFORE asking anything in this section, actually check again
+          whether `sample-data/[slug]-benchmark-data.csv` exists, even if
+          you already noted this at Step 0. Do not rely on memory of an
+          earlier check, especially if several sections have passed since
+          then, actually look.
+        - If it exists, pull the core terms and typical ranges straight
+          from it and show them as bullets. Do not ask the room to name
+          terms that are already on file. Only ask about anything the
+          file doesn't cover.
         - If it does not exist, ask the room to name the core terms this
           persona must use correctly, and typical ranges at a mid-size
           client (volume per month, team size, thresholds)
+        - If you catch yourself about to ask the room to name terms from
+          scratch, stop and check the file first before asking anything.
 
       Section 4. The Diagnostic Data Checklist
-        - If `sample-data/[slug]-data-collection-template.csv` exists, show
-          its fields as grouped bullets (by category) directly. Do not
-          re-ask the room to name fields that are already on file. Only ask
-          the one thing the file can't tell you: which open-ended question
-          should never be skipped, if that isn't obvious from the file's
-          existing pain-point fields.
+        - BEFORE asking anything, actually check again whether
+          `sample-data/[slug]-data-collection-template.csv` exists. Do not
+          rely on memory of the Step 0 check, look again now.
+        - If it exists, show its fields as grouped bullets (by category)
+          directly. Do not re-ask the room to name fields that are already
+          on file. Only ask the one thing the file can't tell you: which
+          open-ended question should never be skipped, if that isn't
+          obvious from the file's existing pain-point fields.
+        - If you catch yourself about to build the checklist from scratch,
+          stop and check the file first before asking anything.
         - If it does not exist, build the checklist with the room now
-          (aim for 10 to 16 fields across volume, process, technology,
-          metric, and an open pain-point question), then save it to
+          (aim for 15 to 20 fields spread across this process's own
+          sub-process groups, its hard metrics, a control question, and an
+          open pain-point question), then save it to
           `sample-data/[slug]-data-collection-template.csv` before moving
           on to Section 5
         - What counts as "not enough data yet" versus ready to diagnose
 
       Section 5. Benchmarks It Must Know
-        - If `sample-data/[slug]-benchmark-data.csv` exists, show the
-          leading / average / lagging table straight from it as bullets.
-          Do not re-derive numbers that are already on file. Only ask which
-          one or two of those benchmarks are the strongest predictor of
-          hidden cost, and why, since that judgment isn't in the file.
-        - If it does not exist, sketch a leading practice / average /
-          lagging practice table for the 4 to 6 metrics that matter most,
-          with the room, then save it to
+        - This is the same file you already read in Section 3. Use what
+          you already have, do not re-read or re-derive it, and do not
+          ask the room to name benchmarks that are already on file.
+        - Show the global / India / commonly observed table straight from
+          it as bullets. Only ask which one or two of those benchmarks are
+          the strongest predictor of hidden cost, and why, since that
+          judgment isn't in the file.
+        - If Section 3 found the file does not exist, sketch it fresh here
+          instead (see below), you do not need to re-check, you already
+          know.
+        - If it does not exist, sketch a benchmark table for the 4 to 6
+          metrics that matter most, with the room, using the same shape as
+          the AP one: a global point, an India point, a commonly observed
+          range, and a one-line read per metric. Then save it to
           `sample-data/[slug]-benchmark-data.csv`
         - The rule: never call a client number good or bad without naming
-          the benchmark band
+          the comparison points and the unit
 
       Section 6. How It Talks To A Client
         - Tone: warm, precise, curious
@@ -132,13 +155,18 @@ L4. INTERVIEW SECTIONS 2 TO 7.
         - How it should handle a defensive or evasive answer
 
       Section 7. What "Done" Looks Like
-        - If a reference report exists for this process in `sample-data/`
-          (for AP: `ap-reference-diagnostic-report.md`), show its section
-          structure directly as bullets. Do not ask the room to name
-          sections that are already on file.
+        - BEFORE asking anything, actually check again whether a reference
+          report exists for this process in `sample-data/` (for AP:
+          `ap-reference-diagnostic-report.md`). Do not rely on memory of
+          the Step 0 check, look again now.
+        - If it exists, show its section structure directly as bullets.
+          Do not ask the room to name sections that are already on file.
+        - If you catch yourself about to invent a section structure from
+          scratch, stop and check the file first before asking anything.
         - If none exists, use the AP reference report's structure
-          (Executive Summary, What We Heard, Volumetric Summary,
-          Diagnosis, Opportunities, Suggested Next Steps) as the shape,
+          (Executive Summary, As-is Observations as a tagged finding grid,
+          Maturity Assessment, Benchmarking, Opportunities by Lever,
+          Suggested Next Steps) as the shape,
           ask the room to swap in this process's own section content
 
 L5. TEACHING BEAT AND PACE UPDATE AFTER EACH SECTION.

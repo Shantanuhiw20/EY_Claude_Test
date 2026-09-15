@@ -36,10 +36,10 @@ The common problems and the fix for each. Each session file also has its own tro
 **The Vercel deploy fails**
 - Paste the exact error to Claude and ask it to fix it. Most deploy failures are one missing setting or environment variable.
 - If Claude says it cannot log in to Vercel, it needs you to finish a sign-in in the browser. Use your Vercel account (the one tied to your GitHub account), then tell Claude to try again.
-- If the chat fails on your laptop before you have added any API key, that is the Claude Code CLI path. Check `claude -p "hello"` works in your terminal first. See Session 4's Troubleshooting for the rest.
+- If the chat fails on your laptop before you have added any API key, that is the Claude Code CLI path. Check `claude -p "hello"` works in your terminal first. See Session 5's Troubleshooting for the rest.
 - If the live app loads but does not respond, tell Claude: `Check OPENROUTER_API_KEY, AI_MODEL, SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are all set on Vercel for both production and preview, add any that are missing, and redeploy.`
 - If the app works on your laptop but the live version can't find the persona, a skill, or a sample-data file, `context/` did not make it into the repo. Tell Claude: `Check that context/ is committed and pushed, and that next.config.ts has outputFileTracingIncludes covering ./context/**/*. Fix whichever is wrong and redeploy.`
-- If the live app loads but saving fails, or you see `relation "diagnostic_sessions" does not exist`, the Supabase tables were never created in that project. Go back to the SQL in Session 4's setup section and run it.
+- If the live app loads but saving fails, or you see `relation "diagnostic_sessions" does not exist`, the Supabase tables were never created in that project. Go back to the SQL in Session 5's setup section and run it.
 
 **Claude can't push to GitHub**
 - Read what it is asking for. It usually needs you to finish a sign-in in the browser with your GitHub account. Do that, then tell Claude to try again.

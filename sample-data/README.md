@@ -6,7 +6,7 @@ Everything in this folder is sample data, in the shape a real AP diagnostic uses
 
 **Quoting matters.** Wrap any field containing a comma in double quotes. Question text and `why_it_matters` text very often contain one, and an unquoted comma silently shifts every later column in that row, so a question ends up in the `data_type` column and the app reads nonsense. Check each row has the same number of columns as the header.
 
-**When you swap in your own files:** keep the same file names and column headers if you can, so no session file needs editing. If your files use different field names, update the headers in `ap-data-collection-template.csv` and `ap-benchmark-data.csv`, then check `session-1-claude-md.md`, `session-2-skills.md`, `session-3-research-agents.md`, `session-4-builds.md` and `capstone.md` for hardcoded field names, column names, or field counts. The sessions currently assume sixteen fields, `ap_01` to `ap_16`, and the columns `field_id`, `category`, `question`, `why_it_matters`, `data_type`.
+**When you swap in your own files:** keep the same file names and column headers if you can, so no session file needs editing. If your files use different field names, update the headers in `ap-data-collection-template.csv` and `ap-benchmark-data.csv`, then check `session-1-claude-md.md`, `session-2-skills.md`, `session-3-connectors-brief.md`, `session-4-research-agents.md`, `session-5-builds.md` and `capstone.md` for hardcoded field names, column names, or field counts. The sessions currently assume twenty fields, `ap_01` to `ap_20`, and the columns `field_id`, `category`, `question`, `why_it_matters`, `data_type`.
 
 | File | What it is |
 | --- | --- |

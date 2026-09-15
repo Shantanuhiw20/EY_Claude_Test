@@ -2,11 +2,11 @@
 
 ---
 
-# Session 3: Agents
+# Session 4: Agents
 
 **Day 1, last session of the day**
 
-**What you'll build:** one agent, the Reviewer, at `.claude/agents/reviewer.md`. It gets its first real job today: sharpening the sixteen diagnostic questions before anyone builds them into a live tool. Tomorrow's app is built directly from the persona and the four Session 2 skills, no extra agent layer needed for that. The Reviewer comes back once, at the end of tomorrow's build, to give the generated report a last look.
+**What you'll build:** one agent, the Reviewer, at `.claude/agents/reviewer.md`. It gets its first real job today: sharpening the twenty diagnostic questions before anyone builds them into a live tool. Tomorrow's app is built directly from the persona and the four Session 2 skills, no extra agent layer needed for that. The Reviewer comes back once, at the end of tomorrow's build, to give the generated report a last look.
 
 ---
 
@@ -78,9 +78,9 @@ Agents do not even need files. Describe roles inside one prompt and Claude spins
 
 ```
 Act as three independent agents and run them in parallel. Each one
-reacts to question ap_09 in sample-data/ap-data-collection-template.csv:
-"What percentage of invoices have an exception (mismatch, missing PO,
-duplicate) needing manual resolution?"
+reacts to question ap_08 in sample-data/ap-data-collection-template.csv:
+"What percentage of invoices hit an exception and need manual
+resolution?"
 
 - The AP Manager: answers the way a real AP manager would on a first
   call. Vague on the number, certain about the causes.
@@ -177,7 +177,7 @@ Have my reviewer agent read sample-data/ap-reference-diagnostic-report.md
 as if it were a draft about to go to the client's CFO.
 ```
 
-Watch what happens. The chief of staff hands the file to the Reviewer, the Reviewer reads it in its own context, and the critique comes back. Read it against the report. A good Reviewer notices things like these: the Executive Summary says "meaningful hidden cost" and never puts a rupee figure on it; the report says 68% of discounts are missed and never says what that is worth; the Diagnosis blames non-PO invoices for the exception rate without a number that links the two. If your Reviewer said the report was solid with a few minor points, it is too polite. Step 4 fixes that.
+Watch what happens. The chief of staff hands the file to the Reviewer, the Reviewer reads it in its own context, and the critique comes back. Read it against the report. A good Reviewer notices things like these: the Executive Summary says "meaningful hidden cost" and never puts a rupee figure on it; the report says 68% of discounts are missed and never says what that is worth; the Executive Summary blames non-PO invoices for the exception rate without a number that links the two. If your Reviewer said the report was solid with a few minor points, it is too polite. Step 4 fixes that.
 
 Then the second way in: type `@`, start typing `rev`, pick `reviewer (agent)` from the list, and give it the same file. That list is also your proof the agent is installed.
 
@@ -195,15 +195,15 @@ Run the test again. The critique gets more specific and harder to wave away. **D
 
 ---
 
-## The Reviewer's first real job: the sixteen questions
+## The Reviewer's first real job: the twenty questions
 
-The sixteen questions in `sample-data/ap-data-collection-template.csv` shipped with the repo as sample data. In Session 2 you built `/data-checklist` on them without ever challenging them. They read fine on a screen. That is the problem. A question can look reasonable and still be leading, or two questions in one, or something no AP manager could answer with a real number. Tomorrow morning the app starts asking them of a live "client". This is the last checkpoint before that.
+The twenty questions in `sample-data/ap-data-collection-template.csv` shipped with the repo as sample data. In Session 2 you built `/data-checklist` on them without ever challenging them. They read fine on a screen. That is the problem. A question can look reasonable and still be leading, or two questions in one, or something no AP manager could answer with a real number. Tomorrow morning the app starts asking them of a live "client". This is the last checkpoint before that.
 
 ### Step 1: The critique
 
 ```
 Have my reviewer agent read sample-data/ap-data-collection-template.csv,
-the sixteen questions (ap_01 to ap_16) the app will ask a client
+the twenty questions (ap_01 to ap_20) the app will ask a client
 tomorrow. This time the draft is a question set, not a report.
 Same lens: a sceptical CFO hearing these asked of their AP manager.
 
@@ -215,9 +215,10 @@ which of these it is:
   than know one, or the data_type does not fit the question.
 Questions that are fine, it leaves alone.
 
-Then name any category (Volume, Process, Technology, Metric, Team,
-Vendor, Pain point, Culture) that is missing a question a real AP
-diagnostic would need, and say what that question would be.
+Then name any category (Vendor Master, Invoice Processing, Payments,
+Reconciliation, Query & Dispute, Compliance, Team, Pain point) that is
+missing a question a real AP diagnostic would need, and say what that
+question would be.
 
 End the usual way: the single biggest gap, this time in the question set.
 ```
@@ -269,7 +270,7 @@ You have one file in `.claude/agents/`, `reviewer.md`, and a sharpened question 
 
 ---
 
-> **Checkpoint: Session 3 complete**
+> **Checkpoint: Session 4 complete**
 >
 > - [ ] You can say in one sentence each what `CLAUDE.md`, a skill, and an agent are for
 > - [ ] Ran the throwaway panel and saw three distinct voices from one prompt
@@ -279,7 +280,7 @@ You have one file in `.claude/agents/`, `reviewer.md`, and a sharpened question 
 
 ---
 
-## Troubleshooting - Session 3
+## Troubleshooting - Session 4
 
 | Issue | Fix |
 | --- | --- |
@@ -295,4 +296,4 @@ You have one file in `.claude/agents/`, `reviewer.md`, and a sharpened question 
 
 ---
 
-**Next:** [Session 4: The Guided Build →](session-4-builds.md)
+**Next:** [Session 5: The Guided Build →](session-5-builds.md)

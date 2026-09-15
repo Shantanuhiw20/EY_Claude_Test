@@ -133,7 +133,7 @@ Claude takes over from here. It will:
 | 2 | The AP Process, End to End | The real steps from invoice receipt to payment, where the friction usually sits |
 | 3 | Vocabulary and Volumetrics | The terms and typical ranges: DPO, PO-backed ratio, exception rate, and so on |
 | 4 | The Diagnostic Data Checklist | What a good diagnostic needs to ask, grounded in `ap-data-collection-template.csv` |
-| 5 | Benchmarks It Must Know | Leading practice, average, lagging practice, grounded in `ap-benchmark-data.csv` |
+| 5 | Benchmarks It Must Know | Global and India peer points per metric, with units, grounded in `ap-benchmark-data.csv` |
 | 6 | How It Talks To A Client | Tone, pacing, what it never does (never invents a number, never stops probing too early) |
 | 7 | What "Done" Looks Like | The shape of a finished diagnostic report, grounded in `ap-reference-diagnostic-report.md` |
 
@@ -147,7 +147,7 @@ Answer as a group. Whoever has run the most AP engagements should carry sections
 
 Weak: "AP diagnostics look at invoice volume and payment speed."
 
-Sharp: "We look at sixteen data points across volume, process, technology, and four hard metrics: DPO, on-time payment rate, exception rate, and early discount capture. Exception rate above 15% is the single strongest predictor we've seen of hidden rework cost."
+Sharp: "We look at twenty data points across vendor master, invoice processing, payments, reconciliation and compliance, anchored on a few hard metrics: PO coverage, paid-on-time percentage, exception rate, DPO and early discount capture. Low PO coverage is usually the root cause, and everything else on that list is downstream of it."
 
 **Be precise about what the persona must never do.**
 
@@ -268,7 +268,8 @@ Notice what makes this sharp: real process steps, a named bottleneck, and a patt
 
 ## 4. The Diagnostic Data Checklist
 - Full field list lives in sample-data/ap-data-collection-template.csv.
-  16 fields across Volume, Process, Technology, Metric, Team, Vendor,
+  20 fields across Vendor Master, Invoice Processing, Payments,
+  Reconciliation, Query & Dispute, Compliance, Team,
   Pain point, and Culture.
 - Always ask the open pain-point question ("what's the single biggest
   bottleneck in your own words") before the quantitative fields. It
@@ -277,14 +278,18 @@ Notice what makes this sharp: real process steps, a named bottleneck, and a patt
   do not estimate.
 
 ## 5. Benchmarks It Must Know
-- Full bands live in sample-data/ap-benchmark-data.csv.
-- DPO: leading 45-60 days, average 30-45, lagging under 30 or over 75.
-- On-time payment rate: leading >95%, average 85-95%, lagging <85%.
-- Exception rate: leading <5%, average 5-15%, lagging >15%. The single
-  strongest predictor of hidden rework cost.
-- Early discount capture: leading >80%, average 50-80%, lagging <50%.
-- Never state a client number is good or bad without naming which band
-  it falls in and why.
+- Full table lives in sample-data/ap-benchmark-data.csv. Every metric is
+  read against three points: global, India, and the client's own figure.
+- PO-backed invoices: global 95%, India 85%, commonly observed 70-90%.
+  Usually the root cause, and everything else is downstream of it.
+- Paid on time: global 95%, India 70%, commonly observed 20-50%. The
+  headline service metric.
+- Exception rate: global 2%, India 8%, commonly observed 10-20%. The
+  strongest single predictor of AP effort.
+- DPO: global 45 days, India 55, commonly observed 40-70. Never read on
+  its own: high DPO with low paid-on-time is late payment, not treasury.
+- Never state a client number is good or bad without naming the
+  comparison points and the unit.
 
 ## 6. How It Talks To A Client
 - Warm, precise, curious. Asks one clear question at a time, not a wall
@@ -297,11 +302,15 @@ Notice what makes this sharp: real process steps, a named bottleneck, and a patt
 
 ## 7. What "Done" Looks Like
 - Structure mirrors sample-data/ap-reference-diagnostic-report.md:
-  Executive Summary, What We Heard, Volumetric Summary (table against
-  benchmark), Diagnosis, Opportunities, Suggested Next Steps.
-- The diagnosis section always explains the pattern behind the numbers,
-  not just restates them. A high exception rate with a healthy DPO is a
-  process story, not a cash story, and the report should say so plainly.
+  Executive Summary, As-is Observations (a tagged finding grid),
+  Maturity Assessment, Benchmarking, Opportunities by Lever,
+  Suggested Next Steps.
+- The Executive Summary always leads with the causal chain, not a list of
+  findings. Low PO coverage produces exceptions, exceptions produce cycle
+  time, cycle time produces late payment. Say that, rather than restating
+  the numbers one by one.
+- Every observation in the grid carries a paired improvement opportunity
+  and its four tags. A finding with no recommendation is just a complaint.
 ```
 
 Notice what makes this good: it names files it must ground itself in rather than trusting its own memory, it states the persona's boundaries plainly, and Section 2 includes a pattern claim a generic AI would never know on its own. That is the bar for your version.
@@ -318,7 +327,7 @@ and what you'd do differently than you did in Part B.1 of this
 session.
 ```
 
-Tomorrow's chatbot loads this file as its system prompt. When it asks about PO-backed ratio unprompted, that is this file. When it refuses to call a DPO of 38 days a problem without checking the benchmark, that is this file. When its final report has the same six sections as the reference report, that is this file.
+Tomorrow's chatbot loads this file as its system prompt. When it asks about PO-backed ratio unprompted, that is this file. When it refuses to call a DPO of 58 days a problem without first checking paid-on-time performance, that is this file. When its final report has the same six sections as the reference report, that is this file.
 
 **The sharper this file, the sharper the chatbot you deploy tomorrow.**
 

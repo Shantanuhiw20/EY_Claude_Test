@@ -16,7 +16,7 @@ Three accounts to have ready before you arrive. All free and quick to set up.
 
 **A Vercel account.** Go to vercel.com, click Sign Up, and choose "Continue with GitHub". Sign in with the GitHub account you just created. That is the whole step. Vercel is where your app will run live on Day 2.
 
-**A Supabase account.** Go to supabase.com and sign up, again choosing "Continue with GitHub". Signing up is all you need to do now. You will create the actual project and its tables during Session 4, following the steps there. Supabase is the database that saves each client interview so it can be picked up again later.
+**A Supabase account.** Go to supabase.com and sign up, again choosing "Continue with GitHub". Signing up is all you need to do now. You will create the actual project and its tables during Session 5, following the steps there. Supabase is the database that saves each client interview so it can be picked up again later.
 
 You do **not** need an API key of your own. While you build on Day 2 the app runs through your Claude Code login. A key is only needed right at the end, to deploy, and the facilitator gives you one then.
 
@@ -40,11 +40,12 @@ You do **not** need an API key of your own. While you build on Day 2 the app run
 1. [Session 0: Intro + Hello Claude](session-0-hello-claude.md)
 2. [Session 1: CLAUDE.md, Then Your AP Persona](session-1-claude-md.md)
 3. [Session 2: Skills - the diagnostic toolkit](session-2-skills.md)
-4. [Session 3: Agents](session-3-research-agents.md)
+4. [Session 3: Connectors + Daily Brief](session-3-connectors-brief.md)
+5. [Session 4: Agents](session-4-research-agents.md)
 
 ## Day 2 - Build + Hackathon
 
-1. [Session 4: The Guided Build - AP Diagnostic Chatbot](session-4-builds.md)
+1. [Session 5: The Guided Build - AP Diagnostic Chatbot](session-5-builds.md)
 2. [Hackathon: Your Own Persona](capstone.md)
 3. [Feedback, testimonials + Close](closing.md)
 
@@ -57,8 +58,9 @@ You do **not** need an API key of your own. While you build on Day 2 the app run
 | 0 | [Hello Claude](session-0-hello-claude.md) | The project folder on your laptop, Claude Code running |
 | 1 | [CLAUDE.md, Then Your AP Persona](session-1-claude-md.md) | A short `CLAUDE.md` (your own context), then `personas/ap-persona.md`, a file describing the AP expert your chatbot will become |
 | 2 | [Skills](session-2-skills.md) | Four small skills live: data-checklist, benchmark-interpreter, template-filler, file-reader |
-| 3 | [Agents](session-3-research-agents.md) | The Reviewer agent in `.claude/agents/`, plus a sharpened set of diagnostic questions, Day 1 closes here |
-| 4 | [The Guided Build](session-4-builds.md) | A deployed AP diagnostic chatbot: code on your own GitHub repo, live on Vercel |
+| 3 | [Connectors + Daily Brief](session-3-connectors-brief.md) | Gmail and Calendar connected, an Engagement Operating Manual in `CLAUDE.md`, a `/brief` skill that reads your real inbox and calendar |
+| 4 | [Agents](session-4-research-agents.md) | The Reviewer agent in `.claude/agents/`, plus a sharpened set of diagnostic questions, Day 1 closes here |
+| 5 | [The Guided Build](session-5-builds.md) | A deployed AP diagnostic chatbot: code on your own GitHub repo, live on Vercel |
 | - | [Hackathon](capstone.md) | Your own persona (AR, R2R, FP&A, or a real client), built with `/build-persona` without touching `CLAUDE.md`, also on GitHub and deployed |
 | - | [Closing](closing.md) | Your plan for after the bootcamp |
 
