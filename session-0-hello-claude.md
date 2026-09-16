@@ -61,7 +61,6 @@ THECRUX-EY-BOOTCAMP
 ├── session-2-skills.md
 ├── session-3-connectors-brief.md
 ├── session-4-research-agents.md
-├── session-5-builds.md
 └── ...
 ```
 

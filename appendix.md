@@ -29,29 +29,6 @@ The common problems and the fix for each. Each session file also has its own tro
 - Your files are saved on disk, not in the chat. They are still there.
 - Type `/clear` to start a clean conversation. Your `CLAUDE.md`, your AP persona file (`personas/ap-persona.md`), and your skills stay.
 
-**A build won't run (Day 2)**
-- Paste the error to Claude. Say: `Fix this.` It usually can.
-- If something is missing, Claude will install it when you ask.
-
-**The Vercel deploy fails**
-- Paste the exact error to Claude and ask it to fix it. Most deploy failures are one missing setting or environment variable.
-- If Claude says it cannot log in to Vercel, it needs you to finish a sign-in in the browser. Use your Vercel account (the one tied to your GitHub account), then tell Claude to try again.
-- If the chat fails on your laptop before you have added any API key, that is the Claude Code CLI path. Check `claude -p "hello"` works in your terminal first. See Session 5's Troubleshooting for the rest.
-- If the live app loads but does not respond, tell Claude: `Check AI_PROVIDER, ANTHROPIC_API_KEY and AI_MODEL are all set on Vercel for both production and preview, add any that are missing, and redeploy.` `AI_PROVIDER` is the one people leave out, and without it the deployed app still tries to use the Claude Code CLI, which does not exist on a server.
-- If the app works on your laptop but the live version can't find the persona, a skill, or a sample-data file, `context/` did not make it into the repo. Tell Claude: `Check that context/ is committed and pushed, and that next.config.ts has outputFileTracingIncludes covering ./context/**/*. Fix whichever is wrong and redeploy.`
-- Only if you did the optional database part (Session 5, Part D): if saving fails, or you see `relation "diagnostic_sessions" does not exist`, the Supabase tables were never created in that project. Go back to the SQL in Part D and run it. If the tables are fine but nothing saves on the live URL, `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are missing on Vercel.
-
-**Claude can't push to GitHub**
-- Read what it is asking for. It usually needs you to finish a sign-in in the browser with your GitHub account. Do that, then tell Claude to try again.
-
-**The chatbot asks too few or too many questions**
-- Too few: tell Claude to check its progress against `sample-data/ap-data-collection-template.csv` and keep going until the checklist is reasonably complete.
-- Too many, or repeating itself: tell it which fields you already answered and ask it to move on.
-
-**A file upload did not get read correctly**
-- The app takes text files: `.txt` and `.csv`. If it is not picking up the content, tell Claude: `Read the actual text of the uploaded file and use it, not just the filename.`
-- Images are deliberately left out of the build. If you want to add screenshot support after the app works, that is one prompt.
-
 ## When stuck
 
 1. Paste the error to Claude. Ask it to fix it.
