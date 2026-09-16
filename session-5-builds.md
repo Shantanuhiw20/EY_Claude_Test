@@ -628,7 +628,29 @@ If the chat stops working:
 
 Once it works on the key, carry on. Everything from here uses the API.
 
-## Step C2: Get your app onto GitHub
+## Step C2 (optional): Add a password gate, and test it locally
+
+Your URL is about to go public in Step C4. Anyone with the link will be able to open it, and Vercel's own password protection is a paid feature not every plan has. Do this now, before the app ever goes live, so it's never sitting on the internet unprotected, not even briefly.
+
+```
+Add a password gate in front of the whole app: middleware.ts checking
+HTTP Basic Auth against a SITE_PASSWORD environment variable. If
+SITE_PASSWORD isn't set, the site stays open, this should never be able
+to lock me out of my own laptop by accident. Apply it to every route,
+including the API routes, not just the pages.
+
+Add SITE_PASSWORD to .env.local, choose the password yourself, whatever
+you'd like it to be. Restart the app and confirm localhost:3000 now asks
+for it.
+```
+
+Whoever opens the link later gets the browser's own login prompt. It always asks for a username too, that's just how the browser renders this kind of login, not something you can turn off from the app's side. It doesn't matter what goes in that field, only the password is actually checked, so anything works there, blank included.
+
+You'll add this same value to Vercel in Step C4, alongside the other environment variables, so the very first deployment already has it rather than a later one.
+
+Share the password separately from the link once it's live, the same way you'd share a door code and an address separately.
+
+## Step C3: Get your app onto GitHub
 
 Only the app goes to GitHub. `ey-fin-os/` becomes its own standalone repo, separate from `thecrux-ey-bootcamp`. That works because in Part A you copied everything the app needs into `ey-fin-os/context/`, so the app is self-contained. Nothing it reads lives outside its own folder any more.
 
@@ -663,7 +685,7 @@ Make sure it is private, not public. Your persona file, your checklist and your 
 
 When it finishes, open the repo URL in your browser and check the file list. GitHub shows a **Private** label next to the repo name. If it says Public, tell Claude: `Make this repository private.` You should see `package.json`, `next.config.ts`, `src/`, and `context/` at the top level. `context/` is the one people forget, and without it the live app has no persona to read. You should not see `.env.local`. If you do, tell Claude: `.env.local got committed. Remove it from git tracking without deleting the file, make sure .gitignore excludes it, and push again.` Then rotate the key in console.anthropic.com, the old one counts as exposed.
 
-## Step C3: Deploy to Vercel
+## Step C4: Deploy to Vercel
 
 The app is the repo root now, so there is no Root Directory to configure and nothing sitting outside it. This step is short.
 
@@ -672,18 +694,18 @@ Deploy this repository to Vercel as a production deployment. The Next.js
 app is at the repo root, so leave the Root Directory as the default, do
 not set it to a subdirectory.
 
-Add these three environment variables from .env.local on Vercel, for both
-production and preview: AI_PROVIDER, ANTHROPIC_API_KEY and AI_MODEL.
-Give me the live URL.
+Add these environment variables from .env.local on Vercel, for both
+production and preview: AI_PROVIDER, ANTHROPIC_API_KEY, AI_MODEL, and
+SITE_PASSWORD too if you set one up in Step C2. Give me the live URL.
 ```
 
 `AI_PROVIDER` is the one people leave out, and it is the one that matters most. Without it on Vercel the deployed app never switches off the Claude Code path, and it fails there because there is no CLI on the server to call.
 
 Claude may ask you to log in to Vercel in the browser. Sign in with your Vercel account (the one tied to your GitHub account), then tell Claude to continue. When it finishes it gives you a live URL, something like `https://ey-ap-diagnostic-yourname.vercel.app`.
 
-## Step C4: Test the live version
+## Step C5: Test the live version
 
-Open the URL it gave you, ideally on your phone or a different browser tab so you're hitting the deployed app, not your local one. Run through the whole loop once more: a short interview, one file upload, generate the report.
+Open the URL it gave you, ideally on your phone or a different browser tab so you're hitting the deployed app, not your local one. If you did Step C2, the browser should ask for the password before showing anything else, confirm that too. Then run through the whole loop once more: a short interview, one file upload, generate the report.
 
 If something that worked locally breaks live, it's almost always one of two things: the environment variables, or `context/` not making it into the repo. See Troubleshooting below.
 
@@ -695,32 +717,12 @@ If something that worked locally breaks live, it's almost always one of two thin
 > - [ ] `ey-fin-os/` is its own **private** GitHub repo, with `package.json` and `next.config.ts` at the top level
 > - [ ] `context/` is in that repo, and `.env.local` is not
 > - [ ] `AI_PROVIDER`, `ANTHROPIC_API_KEY` and `AI_MODEL` are all set on Vercel
+> - [ ] (Optional) If you did Step C2, `SITE_PASSWORD` is set on Vercel too, and the live URL asks for it before showing anything
 > - [ ] Claude gave you a live Vercel URL
 > - [ ] That URL opens in a browser you didn't build the app in
 > - [ ] The chat, the file upload, and the report all work on the live URL, proving the app carried its own persona, skills, and sample data with it
 >
 > This is the finish line for the build. If you're here, you built and shipped a real product in one sitting.
-
----
-
-## Step C5 (optional): Put a password on the live site
-
-Your URL is public. Anyone with the link can open it, and Vercel's own password protection is a paid feature not every plan has. A simple password gate is one prompt.
-
-```
-Add a password gate in front of the whole app: middleware.ts checking
-HTTP Basic Auth against a SITE_PASSWORD environment variable. If
-SITE_PASSWORD isn't set, the site stays open, this should never be able
-to lock me out of my own laptop by accident. Apply it to every route,
-including the API routes, not just the pages.
-
-Then add SITE_PASSWORD to .env.local, choose the password yourself,
-whatever you'd like it to be, and add the same variable to Vercel for
-both production and preview. Redeploy, then show me that the live URL
-now asks for a password, and that the right one gets you in.
-```
-
-Whoever opens the link now gets the browser's own login prompt. It always asks for a username too, that's just how the browser renders this kind of login, not something you can turn off from the app's side. It doesn't matter what goes in that field, only the password is actually checked, so anything works there, blank included. Share the password separately from the link, the same way you'd share a door code and an address separately.
 
 ---
 
