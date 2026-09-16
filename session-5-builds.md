@@ -437,6 +437,15 @@ uploaded file. Where a number was never established, say so plainly
 rather than inventing one.
 
 Return the report as markdown.
+
+Set maxOutputTokens generously, at least 8192. Extended thinking runs by
+default on current Claude models and shares the same output-token budget
+as the report text itself, and how much of that budget thinking uses
+varies from one run to the next. A tight limit means some runs finish
+fine and others cut the report off mid-section for no obvious reason.
+
+Also export maxDuration (at least 90) from this route file, so a long
+generation has time to actually finish once this is deployed.
 ```
 
 ## Step B5: Show the report
@@ -941,6 +950,7 @@ While you are building locally the app shells out to `claude -p`. These are the 
 | The Benchmarking table has no comparison points | Say: `Pull the global_benchmark and india_benchmark columns from context/sample-data/ap-benchmark-data.csv for each metric, and state the unit on every row.` |
 | The whole report reads generic, could be about any company | Say: `This report doesn't sound specific to this conversation, it reads like it could be about anyone. Pull in the actual details this client mentioned, the specific pain point in their own words, the specific vendor or process names if any came up.` |
 | The report is mostly gaps and curly braces | You generated it too early. Go back, answer a few more questions, and generate again. Four or five solid answers is the floor for something worth reading. |
+| The report cuts off partway through, missing later sections, especially on the live URL | The model hit its output-token limit before finishing. Extended thinking shares that same budget and how much it uses varies run to run, so this can pass locally and still fail live. Say: `Raise maxOutputTokens on the report generation call to at least 8192, and export maxDuration (at least 90) from that route file.` |
 
 ### GitHub push and Vercel deploy
 
