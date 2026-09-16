@@ -703,6 +703,27 @@ If something that worked locally breaks live, it's almost always one of two thin
 
 ---
 
+## Step C5 (optional): Put a password on the live site
+
+Your URL is public. Anyone with the link can open it, and Vercel's own password protection is a paid feature not every plan has. A simple password gate is one prompt.
+
+```
+Add a password gate in front of the whole app: middleware.ts checking
+HTTP Basic Auth against a SITE_PASSWORD environment variable. If
+SITE_PASSWORD isn't set, the site stays open, this should never be able
+to lock me out of my own laptop by accident. Apply it to every route,
+including the API routes, not just the pages.
+
+Then add SITE_PASSWORD to .env.local, choose the password yourself,
+whatever you'd like it to be, and add the same variable to Vercel for
+both production and preview. Redeploy, then show me that the live URL
+now asks for a password, and that the right one gets you in.
+```
+
+Whoever opens the link now gets a plain browser login prompt, no username needed, just the password. Share the password separately from the link, the same way you'd share a door code and an address separately.
+
+---
+
 # PART D (optional) - Give it a memory
 
 **Only start this once Part C is live and working.** Everything below is a second lap over an app that already does its job. If you stop before this, you still have a complete, deployed product.
