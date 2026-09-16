@@ -268,7 +268,12 @@ leading practice, or whether a number is good or bad during the interview,
 that happens later, in the report. It never assumes an answer the client
 did not give. It knows when it has enough, roughly ten to twelve solid
 answers across the checklist categories, not every field, and says so
-plainly when it gets there, offering to move to the report.
+plainly when it gets there, telling the client to click "Generate
+Report" at the top of the screen. That is an instruction, not a
+question: it never asks "shall I generate the report?" or offers to do
+it itself, since it has no way to trigger generation from inside the
+chat, only that button does, and only that path makes the PDF download
+available afterward.
 
 Three standing rules it must never break. It is software, not a person:
 it never presents itself as a consultant or a member of the EY team, and
@@ -820,13 +825,21 @@ Restructure the app so each interview has its own URL:
 - The system prompt is told when it is resuming, so the agent welcomes
   the client back instead of greeting them as a stranger.
 
-Leave the file upload and how the report is generated exactly as they
-are. Just make the result persist: when "Generate Report" produces a
-report, save it to that session's report_markdown column. When
-/chat/[sessionId] loads a session that already has a report saved, show
-that report view directly instead of the chat, the same way "Back to
-interview" already reveals the chat, just the reverse. Regenerating
-overwrites the saved report, it does not version it.
+Leave the file upload alone. For report generation, one thing has to
+change now that a landing page exists: fetch that session's client_name
+and process before generating, and hand them to the model explicitly,
+flagged as setup information rather than something the client said
+during the interview. Without this the report always shows the client
+name as not established, because the model only ever sees the
+conversation transcript, and the client typed their organisation name
+on a page before the conversation started, not during it. Otherwise
+leave report generation as it is. Just make the result persist: when
+"Generate Report" produces a report, save it to that session's
+report_markdown column. When /chat/[sessionId] loads a session that
+already has a report saved, show that report view directly instead of
+the chat, the same way "Back to interview" already reveals the chat,
+just the reverse. Regenerating overwrites the saved report, it does not
+version it.
 
 Add a "Copy link to resume" button in the chat header.
 
@@ -871,6 +884,7 @@ Open the live URL, start an interview, answer a question, copy the resume link, 
 | The landing page does not create an interview, or / is still the old chat | The restructure did not land. Say: `The / page should create a row in diagnostic_sessions and redirect to /chat/[that session id]. Show me the code that does it.` |
 | It saves locally but not on the live Vercel URL | The Supabase variables are missing on Vercel. Tell Claude: `Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set on Vercel for both production and preview, then redeploy.` |
 | I pasted the `service_role` key somewhere public | Treat it as compromised. In Supabase, Project Settings, API Keys, on the Legacy anon, service_role tab, roll the key, then update `.env.local` and Vercel with the new one. |
+| The report always shows the client name as not established, even though I typed it on the landing page | The report call never sees that field. Say: `Fetch client_name and process from diagnostic_sessions before generating the report, and pass them to the model explicitly, flagged as setup info rather than something the client said in the conversation.` |
 
 ---
 
