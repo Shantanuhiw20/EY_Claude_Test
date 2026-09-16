@@ -720,7 +720,7 @@ both production and preview. Redeploy, then show me that the live URL
 now asks for a password, and that the right one gets you in.
 ```
 
-Whoever opens the link now gets a plain browser login prompt, no username needed, just the password. Share the password separately from the link, the same way you'd share a door code and an address separately.
+Whoever opens the link now gets the browser's own login prompt. It always asks for a username too, that's just how the browser renders this kind of login, not something you can turn off from the app's side. It doesn't matter what goes in that field, only the password is actually checked, so anything works there, blank included. Share the password separately from the link, the same way you'd share a door code and an address separately.
 
 ---
 
