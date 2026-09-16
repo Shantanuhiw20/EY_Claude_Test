@@ -13,6 +13,7 @@ Everything in this folder is sample data, in the shape a real AP diagnostic uses
 | `ap-data-collection-template.csv` | The volumetric and process questions an AP diagnostic interview collects |
 | `ap-benchmark-data.csv` | Benchmark ranges for those same metrics |
 | `ap-reference-diagnostic-report.md` | What a finished AP diagnostic write-up looks like, the shape the build's report generator mirrors |
+| `design.md` | The visual design spec (colours, typography, banners, table style) for rendering the report as a branded PDF, reverse-engineered from an EY Finance Transformation deck |
 | `ar-data-collection-template.csv` | Same shape, for the AR hackathon track |
 | `r2r-data-collection-template.csv` | Same shape, for the R2R hackathon track |
 | `fpa-data-collection-template.csv` | Same shape, for the FP&A hackathon track |

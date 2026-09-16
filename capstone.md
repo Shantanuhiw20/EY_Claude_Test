@@ -6,7 +6,7 @@
 
 **After lunch, right after the guided build.**
 
-**What you'll build:** the same pattern as this morning, adapted to your own process. Same chat interface, same file upload, same answer tracking, same report generator. Different persona, different data.
+**What you'll build:** the same pattern as this morning, adapted to your own process. Same chat interface, same file upload, same checklist logic, same report generator. Different persona, different data.
 
 ---
 
@@ -14,7 +14,7 @@
 
 This morning you built one thing end to end: an Accounts Payable diagnostic chatbot. It takes a chat conversation, an uploaded file, a checklist of what data is still missing, and a benchmarked report at the end. You deployed it live to Vercel.
 
-That AP build was never the point. It was the demonstration. The real point is the pattern underneath it: a chat interface that asks structured questions, a tool that records each answer so you always know what is still missing, a benchmark table to compare against, and a report generator that writes it all up in a consistent format.
+That AP build was never the point. It was the demonstration. The real point is the pattern underneath it: a chat interface that asks structured questions, a checklist that tells the agent what is still missing, a benchmark table to compare against, and a report generator that writes it all up in a consistent format.
 
 That pattern works for any finance process, not just AP. This session, you point it at your own.
 
@@ -29,8 +29,8 @@ Do not rebuild any of this. Reuse it.
 - The chat interface you deployed this morning.
 - The file upload flow.
 - The checklist logic itself: what has been answered, what is still missing, and what to ask next.
-- The answer extraction step and the progress bar. These read the field ids straight out of whichever checklist CSV is loaded, so they work for your new process without any changes. The landing page already asks which process an interview is for, so pick your track there when you start one and the rows get labelled correctly.
-- Your Supabase project, the three tables, and the resumable session links. Same database, same schema. A new process does not need a new project.
+- The opening message. It is built on the server from whichever checklist CSV is loaded, so it picks up your new first question on its own.
+- If you did the optional database part this morning: your Supabase project, its two tables, and the resumable session links. Same database, same schema. A new process does not need a new project, and the landing page already asks which process an interview is for, so pick your track there when you start one.
 - The report generator and its output format.
 - The four skills and the Reviewer agent from Day 1. Their rules are about how to run a diagnostic, not about AP. They carry over as they are.
 - Your GitHub push flow and your Vercel deployment setup.
@@ -56,7 +56,7 @@ So there is one extra step this afternoon, and it takes a second: run `npm run s
 
 After that, the rest of the build (chat app, file upload, checklist tracking, report generation, GitHub push, Vercel deploy) works exactly as it did this morning.
 
-One thing worth knowing: your new checklist CSV has its own field ids, `ar_01`, `r2r_01`, and so on, not `ap_01`. The extraction step reads the ids from whichever CSV is loaded, so it picks these up on its own. You do not need to change it, the database, or the progress bar. If it starts recording `ap_01` for an AR interview, it is reading the wrong CSV, and that is a sync problem.
+One thing worth knowing: the app reads whichever checklist CSV you point it at, so the questions change on their own once it is reading your new one. You do not need to touch the chat flow or the report generator for that. If it is still asking AP questions after you have wired the new persona in, it is reading the wrong CSV, and that is usually a sync problem.
 
 ---
 
@@ -107,7 +107,7 @@ Show me the output.
 - No ready-made R2R benchmark or report template exists yet. Same exercise as AR: `/build-persona` sketches one with you.
 
 **What stays the same:**
-- Chat flow, upload, answer tracking, report generator, GitHub push, deployment. `CLAUDE.md` too, untouched.
+- Chat flow, upload, checklist logic, report generator, GitHub push, deployment. `CLAUDE.md` too, untouched.
 
 **Starter prompts:**
 
@@ -138,7 +138,7 @@ and show me the finished report.
 - No ready-made FP&A benchmark or report template yet. `/build-persona` sketches one with you, same as the other two tracks.
 
 **What stays the same:**
-- Chat flow, upload, answer tracking, report generator, GitHub push, deployment. `CLAUDE.md` too, untouched.
+- Chat flow, upload, checklist logic, report generator, GitHub push, deployment. `CLAUDE.md` too, untouched.
 
 **Starter prompts:**
 
@@ -167,7 +167,7 @@ and point out anything that still reads like an AP report by mistake.
 - Everything about the pattern is identical to what you built this morning. Only the content is real.
 
 **What stays the same:**
-- Chat flow, upload, answer tracking, report generator, GitHub push, deployment. All of it, unchanged. `CLAUDE.md` too, untouched.
+- Chat flow, upload, checklist logic, report generator, GitHub push, deployment. All of it, unchanged. `CLAUDE.md` too, untouched.
 
 **Data safety, read this before you touch real client data:**
 
@@ -219,9 +219,11 @@ Then ship to the same repo you deployed this morning:
 ```
 Commit everything that changed in ey-fin-os, including context/, and
 push it to the same GitHub repo we deployed this morning. Then redeploy
-to Vercel as a production deployment, and confirm OPENROUTER_API_KEY,
-AI_MODEL, SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are all still set
-there for both production and preview. Give me the live URL.
+to Vercel as a production deployment, and confirm AI_PROVIDER,
+ANTHROPIC_API_KEY and AI_MODEL are all still set there for both
+production and preview. If I set up the database this morning, check
+SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are still there too. Give me
+the live URL.
 ```
 
 If you'd rather ship the hackathon build as a separate, standalone repo:
@@ -232,10 +234,10 @@ ey-ar-diagnostic and push ey-fin-os to it as the repo root, so
 package.json sits at the top level. Before you push, make sure .env.local is in .gitignore and is
 not being committed, and that context/ IS being committed. Show me the
 repo URL when done. Then deploy it to Vercel as a production deployment,
-leaving Root Directory as the default, and add OPENROUTER_API_KEY,
-AI_MODEL, SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from .env.local as
-environment variables for both production and preview. Give me the live
-URL.
+leaving Root Directory as the default, and add every variable from
+.env.local as an environment variable for both production and preview:
+AI_PROVIDER, ANTHROPIC_API_KEY, AI_MODEL, and SUPABASE_URL and
+SUPABASE_SERVICE_ROLE_KEY if they are in there. Give me the live URL.
 ```
 
 If Claude asks you to finish a sign-in to GitHub or Vercel in the browser, do that with your own accounts and tell it to carry on. Deploy early, then redeploy as you improve things. Don't leave the first deploy until the end.
@@ -251,8 +253,8 @@ Check every line before you present.
 > - [ ] The chat asks the right questions for your track, not the AP ones.
 > - [ ] You have a benchmark table for your track (built by `/build-persona` with you, brought from a real client, or reused AP's if your track is AP-adjacent).
 > - [ ] You have a report template shape for your track.
-> - [ ] The progress bar moves as you answer, using your new field ids, not the AP ones.
-> - [ ] You closed the tab, reopened the session link, and the interview carried on where it stopped.
+> - [ ] The opening message shows your track's first question, not the AP one.
+> - [ ] (Only if you did the optional database part) You closed the tab, reopened the session link, and the interview carried on where it stopped.
 > - [ ] You ran the whole flow at least once, start to finish: upload, chat, checklist, generated report.
 > - [ ] Your updated code is pushed, either to this morning's repo or to a fresh one with the remote re-pointed the same way, not the original starter repo.
 > - [ ] You ran `npm run sync-context` after `/build-persona`, so your new persona and any new sample-data files are inside `ey-fin-os/context/` and committed.
@@ -295,7 +297,7 @@ Everyone else keeps their app open on their own screen, so during the close peop
 | Symptom | Fix |
 |---|---|
 | Chat still asks AP questions after your new persona file is saved | Two possible causes, check in this order. First, you may not have synced: run `npm run sync-context` and look for your new persona in `ey-fin-os/context/personas/`. If it's there, the app is still wired to the AP file, so tell Claude: `The chat is still asking AP questions. Wire the system prompt and chat questions to read my new persona from context/personas/ instead, and confirm it's actually being read.` |
-| The progress bar says a field is missing when you already answered it | The extraction step returned an id that isn't in the loaded CSV, so it was thrown away. Check `npm run sync-context` has run and that the app is reading your track's CSV, not the AP one. |
+| The opening message still shows the AP first question | The app is reading the AP CSV. Check `npm run sync-context` has run, then tell Claude: `The opening message should read the first question out of my track's checklist CSV, not the AP one. Show me which file it is reading.` |
 | Report comes out with AP framing or AP metric names baked in | The report generator template still has the old persona's wording hardcoded. Point Claude at your new persona file's reference report section and ask it to rebuild the generator from that shape, not patch the old one. |
 | No benchmark file exists for your track and you're not sure what global or India numbers to use | That's fine, this is expected for AR, R2R and FP&A before `/build-persona` runs. Say so out loud in the demo: "this benchmark table is our own quick estimate, not an EY-validated one." Directionally right is enough for today. |
 | `/build-persona` says a persona file already exists | That's fine if you're resuming. Say `start fresh` if you want to rebuild it from scratch instead, and confirm the overwrite. |

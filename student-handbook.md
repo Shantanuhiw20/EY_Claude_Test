@@ -16,7 +16,7 @@ Three accounts to have ready before you arrive. All free and quick to set up.
 
 **A Vercel account.** Go to vercel.com, click Sign Up, and choose "Continue with GitHub". Sign in with the GitHub account you just created. That is the whole step. Vercel is where your app will run live on Day 2.
 
-**A Supabase account.** Go to supabase.com and sign up, again choosing "Continue with GitHub". Signing up is all you need to do now. You will create the actual project and its tables during Session 5, following the steps there. Supabase is the database that saves each client interview so it can be picked up again later.
+**A Supabase account.** Go to supabase.com and sign up, again choosing "Continue with GitHub". Signing up is all you need to do now. Supabase is a database, and it powers the optional last part of Session 5, where each client interview gets saved so it can be picked up again later. Your app is complete and deployed before that part starts, so this one is worth having ready but nothing depends on it.
 
 You do **not** need an API key of your own. While you build on Day 2 the app runs through your Claude Code login. A key is only needed right at the end, to deploy, and the facilitator gives you one then.
 
@@ -30,7 +30,7 @@ You do **not** need an API key of your own. While you build on Day 2 the app run
 | An AP persona file, describing the AP finance role you are building for | `personas/ap-persona.md` |
 | Four small skills: data-checklist, benchmark-interpreter, template-filler, file-reader | `.claude/skills/` |
 | The Reviewer agent, wrapping a job and rules it never breaks around critiquing a report or a question set, plus a sharpened set of diagnostic questions from the Reviewer | `.claude/agents/` |
-| A deployed AP diagnostic chatbot: chat intake, file upload, every interview saved and resumable from its own link, benchmarked report, code on your own GitHub repo, live on Vercel | `ey-fin-os/` |
+| A deployed AP diagnostic chatbot: chat intake, file upload, benchmarked report, code on your own GitHub repo, live on Vercel. Optionally, every interview saved to a database and resumable from its own link | `ey-fin-os/` |
 | A second persona (AR, R2R, FP&A, or your own real client use case), built with `/build-persona` without touching `CLAUDE.md`, also on GitHub and deployed | `personas/` (new persona file) + your hackathon folder |
 
 ---

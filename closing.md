@@ -16,7 +16,7 @@ Two days ago you had not used this tool. Now look at what you built: a working, 
 - An AP Finance Persona file (`personas/ap-persona.md`) that makes Claude think like an AP expert.
 - Four small skills: data-checklist, benchmark-interpreter, template-filler, file-reader.
 - A Reviewer agent in `.claude/agents/`: a hard read on a draft report or a question set before it goes to a client, and the one that sharpened your diagnostic questions before they went live.
-- A deployed AP diagnostic chatbot: chat-based intake, file upload, every interview saved and resumable from its own link, a benchmarked report, code on your own GitHub repo, live on Vercel.
+- A deployed AP diagnostic chatbot: chat-based intake, file upload, a benchmarked report, code on your own GitHub repo, live on Vercel. And if you went further, every interview saved to a database and resumable from its own link.
 - A second persona of your own (AR, R2R, FP&A, or a real client) built with `/build-persona` and adapted from the first, also on GitHub and live on Vercel.
 
 That is not "trying AI." That is building the diagnostic yourself, and watching it happen in two days.
