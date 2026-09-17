@@ -295,3 +295,5 @@ You have one file in `.claude/agents/`, `reviewer.md`, and a sharpened question 
 | `dry-run/` already has files from an earlier run | Fine to overwrite. Tell Claude: `Overwrite the existing files in dry-run/ with a fresh run.` |
 
 ---
+
+**Next:** [Session 5: The Guided Build →](session-5-builds.md)

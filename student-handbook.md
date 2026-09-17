@@ -43,6 +43,12 @@ You do **not** need an API key of your own. While you build on Day 2 the app run
 4. [Session 3: Connectors + Daily Brief](session-3-connectors-brief.md)
 5. [Session 4: Agents](session-4-research-agents.md)
 
+## Day 2 - Build + Hackathon
+
+1. [Session 5: The Guided Build - AP Diagnostic Chatbot](session-5-builds.md)
+2. [Hackathon: Your Own Persona](capstone.md)
+3. [Feedback, testimonials + Close](closing.md)
+
 ---
 
 ## Sessions At A Glance
@@ -54,6 +60,9 @@ You do **not** need an API key of your own. While you build on Day 2 the app run
 | 2 | [Skills](session-2-skills.md) | Four small skills live: data-checklist, benchmark-interpreter, template-filler, file-reader |
 | 3 | [Connectors + Daily Brief](session-3-connectors-brief.md) | Gmail and Calendar connected, an Engagement Operating Manual in `CLAUDE.md`, a `/brief` skill that reads your real inbox and calendar |
 | 4 | [Agents](session-4-research-agents.md) | The Reviewer agent in `.claude/agents/`, plus a sharpened set of diagnostic questions, Day 1 closes here |
+| 5 | [The Guided Build](session-5-builds.md) | A deployed AP diagnostic chatbot: code on your own GitHub repo, live on Vercel |
+| - | [Hackathon](capstone.md) | Your own persona (AR, R2R, FP&A, or a real client), built with `/build-persona` without touching `CLAUDE.md`, also on GitHub and deployed |
+| - | [Closing](closing.md) | Your plan for after the bootcamp |
 
 **Stuck?** Open the [Appendix](appendix.md). Each session also has its own troubleshooting at the bottom.
 
