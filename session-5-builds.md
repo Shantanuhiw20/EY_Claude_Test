@@ -218,6 +218,10 @@ Run the child process with cwd set to a temporary directory, and strip
 ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN and OPENROUTER_API_KEY from the
 environment you pass it.
 
+If the process fails to spawn at all, make sure that throws a clear
+error instead of hanging forever, listen for the child process's own
+error event, not just its exit code.
+
 Check the installed AI SDK version in node_modules before you write any
 code, and use these names: useChat is imported from @ai-sdk/react and
 never from ai, the token limit option on streamText is maxOutputTokens
@@ -231,13 +235,15 @@ show me the chat answering a simple test message.
 
 Send it "hello" and make sure you get a reply. A plain working chat is the checkpoint here, nothing more.
 
-Three lines in that prompt look arbitrary and are not. Each one is a real failure someone already hit.
+Four lines in that prompt look arbitrary and are not. Each one is a real failure someone already hit.
 
 **Ignore the final assistant event.** The CLI streams the text token by token, then repeats the whole message at the end. Read both and every reply appears twice.
 
 **Run it in a temporary directory.** Claude Code reads `CLAUDE.md` from wherever it starts. Run it inside this project and it quietly inherits your house rules, and the agent starts behaving like a coding assistant instead of a consultant.
 
 **Strip the API key variables.** If `ANTHROPIC_API_KEY` is set, even to the placeholder text sitting in a `.env.local`, Claude Code prefers it over your logged-in session and the call fails with a confusing message about connectors.
+
+**Handle a failed spawn.** If `claude` can't start, for any reason, that should surface as a real error, not a request that just sits there. A silent hang looks the same whether it's a five-second local hiccup or the CLI not existing at all somewhere you deploy this later, and only one of those is something you can fix by waiting.
 
 That block about API names looks fussy and is not. The AI SDK changed these names in a recent version and Claude has seen a lot of older code, so left to itself it often writes the old ones. The app then fails to build, or every message errors. Telling it up front costs you nothing, and if it happens anyway the Troubleshooting table at the bottom has the exact fix.
 
@@ -320,13 +326,80 @@ questions and phrasing actually reflect that expertise and those rules.
 Try again.
 ```
 
+## Step A4: Collect the client's name before the interview starts
+
+Right now `localhost:3000` shows the default Next.js starter page, and the interview actually lives at `localhost:3000/chat`. Nobody told you to fix that, so it stays that way for the rest of the build unless you do it now, and while you're there, use that same first page to collect one thing the interview itself never asks for.
+
+```
+Right now localhost:3000 shows the default Next.js starter page, and the
+actual interview lives at localhost:3000/chat. Fix that, and use the
+same page to collect one more thing before the interview starts.
+
+Replace the root page with a short form: one field asking for the
+client or organisation's name, and a "Continue to interview" button,
+disabled until something is typed. On submit, move to the chat page,
+carrying that name along with it.
+
+The interview and the report should both know this name once it's
+given: pass it alongside the existing request body to the chat API
+route and the report API route. Make sure the system prompt tells the
+agent this name was collected before the session started, not something
+the client said live, so it can use it naturally without treating it as
+an interview answer, and without inferring anything else (industry,
+size, sector) from it, the same no-inference rule as everything else.
+
+If someone reaches the chat page directly without going through this
+form, the app should still work exactly as it does today, the report
+just leaves the client name unestablished the same way it always has.
+```
+
+Open `localhost:3000` fresh (not `/chat`) and check the form is what greets you now, not the Next.js starter page.
+
+**Why this, and why now, not later.** This is the fix for a real problem, not a hypothetical one: without it, `{client name}` sits in every report you will ever generate with this app, because nothing in the 20-odd checklist questions ever asks for it, an AP Manager talking about exception rates has no natural reason to state their own employer's name mid-interview. Doing it here, once the chat and its system prompt already exist, is also less work than doing it later: Part B's report step, two steps from now, just reuses whatever this step already wired up.
+
+**"Collected before the session started, not something said live" is doing real work in that prompt.** Without that framing, the model has no way to distinguish "the client told me their company name during the interview" from "this arrived some other way", and the persona's own rule against inventing facts can make it hesitate to use a name it can't place in the transcript. Saying so directly settles it.
+
+Test this the same way you tested Step A3: open the form, type a name, confirm you land on the interview with the greeting already there. You will not see this name appear anywhere in the report yet, that only happens once Step B4 exists.
+
+## Step A5: Narrow the interview to a fixed, known question set
+
+Step A3 told the agent it knows when it has enough, "roughly ten to twelve solid answers... in whatever order fits the conversation." That sounded reasonable and is worth a second look once the app is actually running: the model decides both which questions to ask and in what order, which means two runs of the same interview can end up asking different things, in a different sequence, phrased differently each time. That makes reports hard to compare and the app hard to test, and it means the interview can open on a question with no fixed follow-up at all, an open-ended "what's the first thing that comes to mind" that can send the conversation anywhere.
+
+```
+The interview currently decides for itself which checklist questions to
+ask and in what order. Make that fixed instead: pick five must-ask
+fields and four high-value fields from the checklist, the ones the
+report's causal chain and its benchmarking table genuinely can't work
+without, and always ask exactly those nine, in the same order, every
+time this runs.
+
+Don't lead with an open-ended question like "what's the first thing
+that comes to mind" as the opener, it has no fixed follow-up path and
+makes the interview unpredictable to test. Start straight on the first
+fixed question instead, and update the opening message to quote it.
+
+The agent can still frame each question naturally, a brief
+acknowledgment of the previous answer before asking the next one, but
+the question itself should track the checklist's own wording closely
+enough that it's recognisably the same question every time, not a
+rephrased or invented one. If an answer already covers a later question
+on the list, skip it rather than asking again, don't ask it a second
+time.
+```
+
+Test it by running the interview twice, with different sample answers each time. The first three questions should come out identical, word for word, both times, only your answers and the agent's acknowledgments should differ.
+
+**Why fix this rather than leave it loose.** A conversational agent that picks its own questions is genuinely more natural to talk to, but "natural" and "reproducible" pull in different directions, and reproducible is what you need once you're troubleshooting something that only shows up after several runs, or comparing two reports to see if a prompt change actually helped. Fixing the question set doesn't make the agent robotic, it can still acknowledge answers like a consultant would, it just stops the *content* of the interview from drifting.
+
 ---
 
 > **Checkpoint A - the app runs and the agent sounds like a consultant**
 >
 > - [ ] The app runs locally and Claude gave you an address to open
+> - [ ] `localhost:3000` itself asks for the client's name before showing the interview, it is no longer the Next.js starter page
 > - [ ] The chat page loads with the agent's greeting and first question already there, before you type anything
 > - [ ] You can answer, and the follow-up sounds like a real consultant, not a generic assistant
+> - [ ] Running the interview twice asks the same first three questions, in the same order, both times
 > - [ ] `npm run sync-context` has been run, and `ey-fin-os/context/` now holds the persona, four skills, the reviewer agent, and the sample data
 > - [ ] Nothing in `ey-fin-os/src/` uses `..` to read files outside the app folder
 >
@@ -441,6 +514,12 @@ Use only numbers the client actually gave you in the conversation or an
 uploaded file. Where a number was never established, say so plainly
 rather than inventing one.
 
+If a client name was collected on the landing page in Step A4, pass it
+to this call too and use it as the report's Client value, the same way
+the chat route already does. It was provided before the session started,
+not said live in the transcript, so don't treat it as an interview
+answer.
+
 Return the report as markdown.
 
 Set maxOutputTokens generously, at least 8192. Extended thinking runs by
@@ -452,6 +531,8 @@ fine and others cut the report off mid-section for no obvious reason.
 Also export maxDuration (at least 90) from this route file, so a long
 generation has time to actually finish once this is deployed.
 ```
+
+Generate a report now and check the header block: if you did Step A4, `Client:` should show the name you typed on the landing page, not `{client name}`. If it still shows the placeholder, the report call isn't receiving what the chat route already gets, check that the request body actually carries the name through.
 
 ## Step B5: Show the report
 
@@ -495,36 +576,29 @@ Run through the whole thing once more, start to finish: fresh interview, a few a
 
 ## Step B7 (optional): The Reviewer gets the last look — silently
 
-Yesterday the Reviewer critiqued the reference report, then the twenty diagnostic questions. Give it the same job here, on every report the app generates, before anyone sees it. But the critique itself stays internal: a skeptical CFO's notes on unsupported claims and shaky sample sizes are useful to whoever writes the report, not to whoever is reading the finished one. The Reviewer's job stays exactly what it was yesterday, critique only, it still never rewrites. A second, separate call does the fixing, using the critique as an input the client never sees.
+Yesterday the Reviewer critiqued the reference report, then the twenty diagnostic questions. Give it the same job here, on every report the app generates, before anyone sees it. But the critique itself stays internal: a skeptical CFO's notes on unsupported claims and shaky sample sizes are useful to whoever writes the report, not to whoever is reading the finished one. The Reviewer's job stays exactly what it was yesterday, critique only, it never rewrites on its own, fixing the report is a separate instruction inside the same call below, not the Reviewer's own job.
 
-Two prompts.
-
-### First, the critique
+One prompt, not two. An earlier version of this step split the critique and the fix into separate calls, a third call to critique, a fourth to revise. That is one full extra round-trip to Claude before anything reaches the screen, on top of the draft call that already ran, and it is the difference between a report that reliably finishes and one that risks getting cut off partway through once this is deployed. Doing both in a single call removes that extra round-trip.
 
 ```
-Add a review pass to report generation. After the report is written,
-make a third call to Claude using the body of context/agents/reviewer.md
-as the instructions, and the generated report as the input. Hold on to
-the critique, but don't show it anywhere in the UI yet.
-```
-
-### Then, a silent revision
-
-```
-Add a fourth call, right after the critique. Give it the same
+Add a review-and-revise pass to report generation. After the report is
+written, make a third call to Claude: give it the body of
+context/agents/reviewer.md as the critique instructions, plus the same
 instructions as report generation (persona, benchmark-interpreter skill,
 template-filler skill, benchmark data, reference report), plus the draft
-report and the Reviewer's critique, and ask it to produce a revised
-report that fixes whatever in the critique is actually fixable from the
-conversation on record. It must not invent a number to answer a gap the
-critique raised. If the critique points at something genuinely never
-established, that stays flagged exactly as before, just as honestly. It
-must never mention the Reviewer, the critique, or the review process
-anywhere in its output, the client should never know a review happened.
+report. Ask it to do both in that one call: critique the draft against
+the Reviewer's rules, then immediately produce a revised report that
+fixes whatever is genuinely fixable from the conversation on record. It
+must not invent a number to answer a gap the critique raised. If
+something is genuinely never established, that stays flagged exactly as
+before, just as honestly.
 
-Show only this revised report to the user, in the same view as before.
-The Reviewer's raw critique should not be visible anywhere in the app.
+Show only the revised report to the user, in the same view as before.
+The critique itself, and any mention that a review happened, must never
+appear anywhere in the output or the UI.
 ```
+
+This cuts the round-trip in half, not to zero. Two calls before the client sees anything (draft, then this one) is still more than the one call the rest of Part B runs on, so if the report ever cuts off partway through once deployed, this is the first place to look, try without this step and see if it still happens.
 
 If time is short, skip this and move to deploy. It is a nice-to-have in the app. The habit behind it, a hard read over every draft before a client sees it, is the reason the Reviewer exists, but the client was only ever meant to see what that read produced, not the read itself.
 
@@ -598,7 +672,21 @@ The steps below are prompts to Claude Code. It runs the git and Vercel commands 
 
 ## Step C1: Switch to an API key, and test before you deploy
 
-Everything so far has run through your Claude Code login. That only works on your laptop. A deployed app has no Claude Code session to borrow, so from here it needs an API key.
+Everything so far has run through your Claude Code login. That only works on your laptop. A deployed app has no Claude Code session to borrow, so from here it needs an API key, and the provider module needs code that actually knows how to use one.
+
+Back in Part A, that module was only ever built to talk to the CLI. It was shaped so a different provider could be swapped in later ("so a different provider can be swapped in later without touching the chat route"), but nothing has asked for that swap yet. Do that first, before touching any environment variable:
+
+```
+Add a second provider to the provider module: a direct Anthropic API
+model, using @ai-sdk/anthropic, reading ANTHROPIC_API_KEY and AI_MODEL
+from the environment. Add a small selector function that picks between
+them by reading AI_PROVIDER: the CLI model if it's "claude-cli" or
+unset, the Anthropic model if it's "anthropic". Every route that
+currently imports the CLI provider directly should import this selector
+instead, so a single environment variable controls all of them.
+```
+
+Only once that's built does flipping the environment variable below actually do anything. This is the step people skip, since it looks like configuration rather than code, and the result is a deployed app that silently keeps using the CLI path no matter what `.env.local` says, because nothing ever reads it.
 
 Get an **Anthropic API key** now, from **console.anthropic.com** (Settings → API Keys). This is a separate credential from your Claude Code login, with its own metered billing, not covered by a Claude.ai or Claude Code subscription. Also decide which **Claude model** you're calling, e.g. `claude-sonnet-5` — use the exact current model ID, not a guess from memory, since these change.
 
@@ -624,7 +712,7 @@ If the chat stops working:
 | --- | --- |
 | `invalid x-api-key` or `authentication failed` | The key is wrong, or has a stray space or line break. Check it is on one line. |
 | `model not found` or similar | The model ID is wrong or has been retired. Check the exact current ID rather than one from memory. |
-| Still behaving exactly as before | `AI_PROVIDER` is probably still `claude-cli`, so it never switched. Change it and restart. |
+| Still behaving exactly as before | Either the selector function was never wired in, check every route imports it instead of the CLI provider directly, or `AI_PROVIDER` is still `claude-cli` in `.env.local`. Fix whichever it is and restart. |
 
 Once it works on the key, carry on. Everything from here uses the API.
 
