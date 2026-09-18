@@ -1,0 +1,900 @@
+<title>Cashflow Ledger</title>
+<style>
+  :root{
+    --cover: #123524;
+    --cover-2: #0c2a1b;
+    --paper: #ECE2C4;
+    --paper-2: #E1D4AC;
+    --ink: #1B2A4A;
+    --ink-dim: #4b5a78;
+    --brass: #A9822F;
+    --brass-bright: #C9A227;
+    --stamp-red: #A23B2E;
+    --stamp-green: #2A6F4E;
+    --good: #2A6F4E;
+    --bad: #A23B2E;
+    --shadow: rgba(10,20,15,0.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cover: #0a1f14;
+      --cover-2: #071409;
+      --paper: #2a2a20;
+      --paper-2: #232319;
+      --ink: #ECE2C4;
+      --ink-dim: #b8ae8f;
+      --brass: #d4b25a;
+      --brass-bright: #e8c874;
+      --stamp-red: #d4695a;
+      --stamp-green: #6bbf94;
+      --good: #6bbf94;
+      --bad: #d4695a;
+      --shadow: rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --cover: #0a1f14;
+    --cover-2: #071409;
+    --paper: #2a2a20;
+    --paper-2: #232319;
+    --ink: #ECE2C4;
+    --ink-dim: #b8ae8f;
+    --brass: #d4b25a;
+    --brass-bright: #e8c874;
+    --stamp-red: #d4695a;
+    --stamp-green: #6bbf94;
+    --good: #6bbf94;
+    --bad: #d4695a;
+    --shadow: rgba(0,0,0,0.6);
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+  *{box-sizing:border-box;}
+  body{
+    background: var(--cover);
+    background-image:
+      radial-gradient(ellipse at top, var(--cover-2), var(--cover) 70%);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    padding: 24px 16px 48px;
+    min-height: 100%;
+  }
+
+  h1,h2,h3{ text-wrap: balance; margin: 0; }
+
+  .display{
+    font-family: 'Special Elite', 'Courier New', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .num{
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cover-header{
+    text-align:center;
+    color: var(--paper);
+    padding: 8px 8px 20px;
+  }
+  .cover-header .title{
+    font-size: clamp(28px, 5vw, 42px);
+    color: var(--brass-bright);
+    text-shadow: 0 2px 0 rgba(0,0,0,0.3);
+  }
+  .cover-header .subtitle{
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-top: 6px;
+  }
+
+  .ledger-book{
+    background: var(--paper);
+    border-radius: 6px;
+    box-shadow: 0 20px 50px var(--shadow), 0 0 0 1px rgba(0,0,0,0.15);
+    padding: 22px;
+    position: relative;
+    background-image:
+      linear-gradient(var(--paper-2) 1px, transparent 1px);
+    background-size: 100% 34px;
+  }
+  .ledger-book::before{
+    content:"";
+    position:absolute; left: 54px; top:0; bottom:0; width:1px;
+    background: var(--stamp-red);
+    opacity: 0.35;
+  }
+
+  .statusbar{
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap: wrap; gap: 10px;
+    padding-bottom: 14px; margin-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .phase-badge{
+    display:inline-block;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 3px;
+    background: var(--ink); color: var(--paper);
+  }
+  .phase-badge.escaped{ background: var(--good); }
+  .turn-counter{ font-size: 14px; color: var(--ink-dim); }
+
+  .meter-row{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .meter{
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 5px;
+    padding: 10px 12px;
+  }
+  :root[data-theme="dark"] .meter, @media (prefers-color-scheme: dark){ .meter{ background: rgba(0,0,0,0.18); } }
+  .meter .label{ font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-dim); }
+  .meter .value{ font-size: 19px; font-weight: 600; margin-top: 2px; }
+  .meter .value.good{ color: var(--good); }
+  .meter .value.bad{ color: var(--bad); }
+
+  .freedom-track{
+    margin-bottom: 20px;
+  }
+  .freedom-track .label{
+    display:flex; justify-content: space-between;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-dim);
+    margin-bottom: 4px;
+  }
+  .freedom-bar{
+    height: 14px; border-radius: 7px;
+    background: rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+  .freedom-fill{
+    height: 100%;
+    background: linear-gradient(90deg, var(--stamp-red), var(--brass-bright), var(--good));
+    transition: width 0.5s ease;
+  }
+
+  .ledger-columns{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 560px){ .ledger-columns{ grid-template-columns: 1fr; } }
+  .ledger-col h3{
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--ink-dim); margin-bottom: 8px;
+    border-bottom: 1px dashed var(--ink-dim); padding-bottom: 6px;
+  }
+  .line-item{
+    display:flex; justify-content: space-between; gap: 8px;
+    font-size: 13.5px; padding: 3px 0;
+  }
+  .line-item .amt{ font-weight: 500; }
+  .line-item.total{
+    border-top: 1px solid var(--ink); margin-top: 4px; padding-top: 6px;
+    font-weight: 700;
+  }
+
+  section.panel{ margin-bottom: 20px; }
+  section.panel h3{
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--ink-dim); margin-bottom: 10px;
+  }
+
+  .asset-grid{ display:grid; gap: 8px; }
+  .asset-card{
+    display:flex; justify-content: space-between; align-items:center; gap: 10px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 5px; padding: 8px 12px;
+    flex-wrap: wrap;
+  }
+  :root[data-theme="dark"] .asset-card, @media (prefers-color-scheme: dark){ .asset-card{ background: rgba(0,0,0,0.2); } }
+  .asset-card .name{ font-weight: 600; font-size: 13.5px; }
+  .asset-card .meta{ font-size: 11.5px; color: var(--ink-dim); }
+  .asset-card .right{ text-align: right; }
+
+  .btn{
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600; font-size: 13px;
+    border: none; border-radius: 4px;
+    padding: 8px 14px; cursor: pointer;
+    background: var(--ink); color: var(--paper);
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  .btn:hover{ transform: translateY(-1px); }
+  .btn:disabled{ opacity: 0.35; cursor: not-allowed; transform:none; }
+  .btn.brass{ background: var(--brass); color: #221a06; }
+  .btn.red{ background: var(--stamp-red); color: #2a0a06; }
+  .btn.ghost{ background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .btn.big{ font-size: 16px; padding: 14px 22px; width: 100%; }
+
+  .shop-grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 10px; }
+  .shop-card{
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px; padding: 12px;
+    display:flex; flex-direction:column; gap: 6px;
+  }
+  :root[data-theme="dark"] .shop-card, @media (prefers-color-scheme: dark){ .shop-card{ background: rgba(0,0,0,0.2); } }
+  .shop-card .title{ font-weight: 700; font-size: 13.5px; }
+  .shop-card .desc{ font-size: 11.5px; color: var(--ink-dim); line-height:1.4; }
+  .shop-card .price{ font-size: 13px; font-weight: 600; }
+
+  .chart-wrap{ width:100%; overflow-x:auto; }
+  svg.chart{ display:block; width:100%; height:120px; }
+
+  .log-list{
+    max-height: 160px; overflow-y: auto;
+    display:flex; flex-direction:column; gap: 4px;
+    font-size: 12.5px;
+  }
+  .log-list .entry{ display:flex; gap:8px; }
+  .log-list .entry .t{ color: var(--ink-dim); flex-shrink:0; width: 46px; }
+
+  .next-btn-wrap{ margin-top: 6px; }
+
+  /* Event modal */
+  .overlay{
+    position: fixed; inset: 0; background: rgba(5,10,8,0.65);
+    display:flex; align-items:center; justify-content:center;
+    padding: 20px; z-index: 50;
+  }
+  .overlay[hidden]{ display:none; }
+  .event-card{
+    background: var(--paper);
+    border-radius: 8px;
+    max-width: 420px; width: 100%;
+    padding: 26px 24px 22px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+    position: relative;
+    transform: rotate(-0.6deg);
+  }
+  .event-card .stamp{
+    position:absolute; top: -14px; right: 18px;
+    font-family: 'Special Elite', monospace;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 10px; border: 3px solid var(--stamp-red);
+    color: var(--stamp-red);
+    transform: rotate(8deg);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.4);
+  }
+  .event-card .stamp.pos{ border-color: var(--stamp-green); color: var(--stamp-green); }
+  .event-card h2{
+    font-family: 'Special Elite', monospace;
+    font-size: 20px; margin-bottom: 10px; color: var(--ink);
+  }
+  .event-card p{ font-size: 14px; line-height: 1.5; margin: 0 0 14px; color: var(--ink); }
+  .event-card .effect{
+    font-size: 13px; font-weight: 600; margin-bottom: 16px;
+    padding: 8px 10px; border-left: 3px solid var(--ink);
+    background: rgba(0,0,0,0.05);
+  }
+  .event-actions{ display:flex; gap: 10px; flex-wrap: wrap; }
+  .event-actions .btn{ flex: 1; }
+
+  .end-screen{ text-align:center; padding: 10px 6px; }
+  .end-screen .headline{
+    font-family:'Special Elite', monospace;
+    font-size: 26px; color: var(--brass-bright); margin-bottom: 6px;
+  }
+  .end-screen p{ font-size: 14px; color: var(--ink-dim); margin-bottom: 16px; }
+  .end-stats{
+    display:grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+    gap: 10px; margin-bottom: 18px;
+  }
+
+  .footer-note{
+    text-align:center; color: rgba(236,226,196,0.55);
+    font-size: 11.5px; margin-top: 18px; line-height: 1.6;
+  }
+</style>
+
+<div class="wrap">
+  <div class="cover-header">
+    <div class="title display">The Cashflow Ledger</div>
+    <div class="subtitle">a passbook for escaping the rat race</div>
+  </div>
+
+  <div class="ledger-book" id="book">
+    <!-- rendered by JS -->
+  </div>
+
+  <div class="footer-note">
+    Educational simulation · figures are simplified for gameplay, not financial advice.
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="event-card" id="eventCard"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- constants (tune here) ---------------- */
+  var START = {
+    cash: 50000,
+    salary: 100000,
+    baseExpenses: [
+      {key:'tax', label:'Income Tax', amt: 15000},
+      {key:'rent', label:'Rent', amt: 20000},
+      {key:'living', label:'Groceries & Utilities', amt: 15000},
+      {key:'transport', label:'Transport', amt: 8000},
+      {key:'misc', label:'Lifestyle & Misc', amt: 7000}
+    ],
+    startingLoan: { name:'Education Loan', balance: 300000, emi: 10000, rate: 0.10 }
+  };
+
+  var ASSET_TYPES = {
+    stock: { label:'Index Fund Lot', baseCost: 20000, incomeRate: 0.0125, volatility: 0.05, desc:'Passive dividend + market swings. Cheap, liquid, slow to matter alone.' },
+    land:  { label:'Land Parcel', baseCost: 400000, incomeRate: 0, appreciation: 0.012, desc:'No income, but appreciates. Patience pays off — literally.' },
+    property: { label:'Rental Apartment', baseCost: 1500000, downPct: 0.2, emiRate: 0.006, rent: 14000, appreciation: 0.004, desc:'Rent income minus EMI. Real freedom comes once the loan is gone.' },
+    business: { label:'Side Business', baseCost: 150000, costStep: 50000, incomeMin: 9000, incomeMax: 16000, desc:'Highest income-per-rupee, but riskier — bad months happen.' }
+  };
+
+  var EVENTS = [
+    { w:3, id:'medical', title:'Medical Emergency', stamp:'PAID OUT', kind:'neg',
+      text:'A sudden hospital visit eats into your savings.',
+      run: function(s){ var amt=40000; s.cash-=amt; return 'Cash −'+fmt(amt)+' for medical bills.'; } },
+    { w:3, id:'car', title:'Car Trouble', stamp:'PAID OUT', kind:'neg',
+      text:'The car breaks down on the highway. Repairs aren\'t optional.',
+      run: function(s){ var amt=12000; s.cash-=amt; return 'Cash −'+fmt(amt)+' for repairs.'; } },
+    { w:2, id:'tax', title:'Tax Notice', stamp:'PAID OUT', kind:'neg',
+      text:'A correction notice from the tax department arrives.',
+      run: function(s){ var amt=15000; s.cash-=amt; return 'Cash −'+fmt(amt)+' settled.'; } },
+    { w:2, id:'wedding', title:'Wedding Season', stamp:'PAID OUT', kind:'neg',
+      text:'Gifts, travel, and one very expensive sherwani.',
+      run: function(s){ var amt=10000; s.cash-=amt; return 'Cash −'+fmt(amt)+' spent on festivities.'; } },
+    { w:2, id:'splurge', title:'Impulse Splurge', stamp:'PAID OUT', kind:'neg',
+      text:'A doodad you didn\'t need, bought anyway. This is exactly the leak that keeps salaries poor.',
+      run: function(s){ var amt=7000; s.cash-=amt; return 'Cash −'+fmt(amt)+' — lifestyle creep.'; } },
+    { w:1, id:'divorce', title:'Divorce Settlement', stamp:'SETTLED', kind:'neg',
+      text:'A hard chapter closes. Assets are split and alimony begins.',
+      run: function(s){
+        var lost = Math.round(s.cash*0.5); s.cash -= lost;
+        var extra=8000;
+        s.recurringExpenses.push({key:'alimony_'+s.turn, label:'Alimony', amt: extra});
+        var soldMsg='';
+        if(s.assets.length){
+          var idx = Math.floor(Math.random()*s.assets.length);
+          var a = s.assets[idx];
+          var proceeds = Math.round(a.value*0.7);
+          s.cash += proceeds;
+          s.assets.splice(idx,1);
+          soldMsg = ' '+a.name+' was sold in the split (+'+fmt(proceeds)+').';
+        }
+        return 'Cash −'+fmt(lost)+'. +'+fmt(extra)+'/mo alimony from now on.'+soldMsg;
+      } },
+    { w:3, id:'bonus', title:'Festival Bonus', stamp:'CREDITED', kind:'pos',
+      text:'Your employer pays out a festival bonus this month.',
+      run: function(s){ var amt=25000; s.cash+=amt; return 'Cash +'+fmt(amt)+' credited.'; } },
+    { w:2, id:'appraisal', title:'Annual Appraisal', stamp:'CREDITED', kind:'pos',
+      text:'Performance review day — and it went well.',
+      run: function(s){
+        var raise = 5000;
+        s.salary += raise;
+        return 'Salary +'+fmt(raise)+'/mo, permanently.';
+      } },
+    { w:1, id:'inherit', title:'Inheritance', stamp:'CREDITED', kind:'pos',
+      text:'A distant relative leaves behind a modest inheritance.',
+      run: function(s){ var amt=60000; s.cash+=amt; return 'Cash +'+fmt(amt)+' inherited.'; } },
+    { w:2, id:'rally', title:'Market Rally', stamp:'MARK-TO-MARKET', kind:'pos',
+      text:'The index is up sharply this month.',
+      run: function(s){
+        var n=0; s.assets.forEach(function(a){ if(a.type==='stock'){ a.value=Math.round(a.value*1.15); n++; } });
+        return n? ('Your '+n+' fund lot(s) rose 15%.') : 'You own no funds — nothing to gain.';
+      } },
+    { w:2, id:'crash', title:'Market Correction', stamp:'MARK-TO-MARKET', kind:'neg',
+      text:'A sharp sell-off hits the index this month.',
+      run: function(s){
+        var n=0; s.assets.forEach(function(a){ if(a.type==='stock'){ a.value=Math.round(a.value*0.82); n++; } });
+        return n? ('Your '+n+' fund lot(s) fell 18%. Paper loss only if you don\'t sell.') : 'You own no funds — nothing lost.';
+      } },
+    { w:2, id:'baby', title:'Growing Family', stamp:'NOTED', kind:'neg',
+      text:'Wonderful news at home — and a new permanent expense line.',
+      run: function(s){
+        var amt=6000;
+        s.recurringExpenses.push({key:'family_'+s.turn, label:'Childcare', amt: amt});
+        return '+'+fmt(amt)+'/mo added to expenses, for good.';
+      } },
+    { w:2, id:'gigoffer', title:'Side Gig Offer', stamp:'YOUR CALL', kind:'choice',
+      text:'A friend offers you into a small business at a friend-rate — below the usual entry price.',
+      choice:{ accept:'Invest '+fmt(0), decline:'Pass' },
+      run: null },
+    { w:2, id:'landdeal', title:'Distress Land Sale', stamp:'YOUR CALL', kind:'choice',
+      text:'A neighbour needs quick cash and offers a land parcel at half the going rate.',
+      run: null },
+    { w:2, id:'condodeal', title:'Builder Fire Sale', stamp:'YOUR CALL', kind:'choice',
+      text:'A builder is offloading a finished apartment at a steep discount to close the books.',
+      run: null },
+    { w:2, id:'landsell', title:'Buyer at the Door', stamp:'YOUR CALL', kind:'choice',
+      text:'A buyer offers well above market for land you own.',
+      run: null },
+    { w:1, id:'bizslow', title:'Slow Month at the Business', stamp:'NOTED', kind:'neg',
+      text:'Footfall was weak this month for one of your side businesses.',
+      run: function(s){
+        var biz = s.assets.filter(function(a){return a.type==='business';});
+        if(!biz.length) return 'You run no business — unaffected.';
+        var b = biz[Math.floor(Math.random()*biz.length)];
+        var cut = Math.round(b.income*0.5);
+        b._oneOffCut = cut;
+        return b.name+'\'s income is halved this month only.';
+      } },
+    { w:2, id:'refund', title:'Tax Refund', stamp:'CREDITED', kind:'pos',
+      text:'A refund from last year\'s filing finally clears.',
+      run: function(s){ var amt=13000; s.cash+=amt; return 'Cash +'+fmt(amt)+' refunded.'; } }
+  ];
+
+  /* ---------------- state ---------------- */
+  var S = null;
+
+  function newGame(){
+    var s = {
+      turn: 1,
+      phase: 'ratrace',
+      cash: START.cash,
+      salary: START.salary,
+      recurringExpenses: [],
+      liabilities: [ { id:'loan0', name: START.startingLoan.name, balance: START.startingLoan.balance, emi: START.startingLoan.emi } ],
+      assets: [],
+      history: [],
+      log: [],
+      nextAssetId: 1,
+      businessesBought: 0,
+      pendingEvent: null
+    };
+    s.history.push(netWorth(s));
+    addLog(s, 'Ledger opened. Salary '+fmt(s.salary)+'/mo.');
+    return s;
+  }
+
+  function fmt(n){
+    n = Math.round(n);
+    var neg = n<0; n=Math.abs(n);
+    var str = n.toString();
+    var last3 = str.substring(str.length-3);
+    var other = str.substring(0,str.length-3);
+    if(other!=='') last3=','+last3;
+    var formatted = other.replace(/\B(?=(\d{2})+(?!\d))/g,',') + last3;
+    return (neg?'−':'')+'₹'+formatted;
+  }
+
+  function addLog(s, text){
+    s.log.unshift({t:'M'+s.turn, text:text});
+    if(s.log.length>60) s.log.pop();
+  }
+
+  function totalExpenses(s){
+    var t = 0;
+    START.baseExpenses.forEach(function(e){ t+=e.amt; });
+    s.recurringExpenses.forEach(function(e){ t+=e.amt; });
+    s.liabilities.forEach(function(l){ t+=l.emi; });
+    return t;
+  }
+
+  function passiveIncome(s){
+    var t=0;
+    s.assets.forEach(function(a){
+      if(a.type==='stock') t += Math.round(a.value*ASSET_TYPES.stock.incomeRate);
+      else if(a.type==='property') t += ASSET_TYPES.property.rent;
+      else if(a.type==='business') t += (a._oneOffCut? a.income-a._oneOffCut : a.income);
+    });
+    return t;
+  }
+
+  function netWorth(s){
+    var w = s.cash;
+    s.assets.forEach(function(a){ w+=a.value; });
+    s.liabilities.forEach(function(l){ w-=l.balance; });
+    return w;
+  }
+
+  function isEscaped(s){ return passiveIncome(s) >= totalExpenses(s); }
+
+  /* ---------------- actions ---------------- */
+  function buyStock(s){
+    var cost = ASSET_TYPES.stock.baseCost;
+    if(s.cash<cost) return;
+    s.cash-=cost;
+    s.assets.push({id:'a'+(s.nextAssetId++), type:'stock', name:'Index Fund Lot', cost:cost, value:cost});
+    addLog(s, 'Bought an index fund lot for '+fmt(cost)+'.');
+    render();
+  }
+
+  function buyLand(s, priceOverride){
+    var cost = priceOverride || ASSET_TYPES.land.baseCost;
+    if(s.cash<cost) return;
+    s.cash-=cost;
+    s.assets.push({id:'a'+(s.nextAssetId++), type:'land', name:'Land Parcel', cost:cost, value:cost});
+    addLog(s, 'Bought a land parcel for '+fmt(cost)+'.');
+    render();
+  }
+
+  function buyProperty(s, opts){
+    opts = opts || {};
+    var full = opts.priceOverride || ASSET_TYPES.property.baseCost;
+    var down = opts.downOverride!=null ? opts.downOverride : Math.round(full*ASSET_TYPES.property.downPct);
+    if(s.cash<down) return;
+    s.cash-=down;
+    var loanAmt = full-down;
+    var emi = Math.round(loanAmt*ASSET_TYPES.property.emiRate);
+    var propId = 'a'+(s.nextAssetId++);
+    s.assets.push({id:propId, type:'property', name:'Rental Apartment', cost:full, value:full, loanBalance:loanAmt});
+    if(loanAmt>0){
+      s.liabilities.push({id:'loan_'+propId, name:'Home Loan', balance:loanAmt, emi:emi, linkedAsset:propId});
+    }
+    addLog(s, 'Bought a rental apartment (down payment '+fmt(down)+', EMI '+fmt(emi)+'/mo).');
+    render();
+  }
+
+  function buyBusiness(s, priceOverride){
+    var cost = priceOverride!=null ? priceOverride : (ASSET_TYPES.business.baseCost + s.businessesBought*ASSET_TYPES.business.costStep);
+    if(s.cash<cost) return;
+    s.cash-=cost;
+    var income = Math.round(ASSET_TYPES.business.incomeMin + Math.random()*(ASSET_TYPES.business.incomeMax-ASSET_TYPES.business.incomeMin));
+    s.businessesBought++;
+    s.assets.push({id:'a'+(s.nextAssetId++), type:'business', name:'Side Business #'+s.businessesBought, cost:cost, value:cost, income:income});
+    addLog(s, 'Started a side business for '+fmt(cost)+' (income '+fmt(income)+'/mo).');
+    render();
+  }
+
+  function sellAsset(s, id){
+    var idx = s.assets.findIndex(function(a){return a.id===id;});
+    if(idx<0) return;
+    var a = s.assets[idx];
+    var proceeds = a.value;
+    if(a.type==='property' && a.loanBalance>0){
+      var lidx = s.liabilities.findIndex(function(l){return l.linkedAsset===a.id;});
+      if(lidx>=0){ proceeds -= s.liabilities[lidx].balance; s.liabilities.splice(lidx,1); }
+    }
+    s.cash += Math.max(0,proceeds);
+    s.assets.splice(idx,1);
+    addLog(s, 'Sold '+a.name+' for '+fmt(a.value)+ (proceeds!==a.value? ' (net '+fmt(Math.max(0,proceeds))+' after loan payoff)':'') +'.');
+    render();
+  }
+
+  function prepayLoan(s, id, amount){
+    var l = s.liabilities.find(function(x){return x.id===id;});
+    if(!l || s.cash<amount) return;
+    amount = Math.min(amount, l.balance);
+    s.cash -= amount;
+    l.balance -= amount;
+    l.emi = Math.max(0, Math.round(l.emi * (l.balance / (l.balance+amount))) || 0);
+    if(l.balance<=0){
+      s.liabilities = s.liabilities.filter(function(x){return x.id!==id;});
+      addLog(s, l.name+' fully paid off! EMI removed.');
+    } else {
+      addLog(s, 'Prepaid '+fmt(amount)+' on '+l.name+'.');
+    }
+    render();
+  }
+
+  function pickEvent(){
+    var totalW = EVENTS.reduce(function(a,e){return a+e.w;},0);
+    var r = Math.random()*totalW;
+    for(var i=0;i<EVENTS.length;i++){
+      r -= EVENTS[i].w;
+      if(r<=0) return EVENTS[i];
+    }
+    return EVENTS[0];
+  }
+
+  function nextMonth(){
+    var s = S;
+    if(s.phase==='ended') return;
+    s.turn++;
+    var income = s.salary + passiveIncome(s);
+    var exp = totalExpenses(s);
+    s.cash += income - exp;
+    s.assets.forEach(function(a){
+      delete a._oneOffCut;
+      if(a.type==='stock'){
+        var change = (Math.random()*2-1)*ASSET_TYPES.stock.volatility;
+        a.value = Math.max(0, Math.round(a.value*(1+change)));
+      } else if(a.type==='land'){
+        a.value = Math.round(a.value*(1+ASSET_TYPES.land.appreciation));
+      } else if(a.type==='property'){
+        a.value = Math.round(a.value*(1+ASSET_TYPES.property.appreciation));
+      }
+    });
+    s.history.push(netWorth(s));
+
+    var wasEscaped = s.phase==='escaped';
+    if(isEscaped(s) && !wasEscaped){
+      s.phase='escaped';
+    }
+
+    var ev = pickEvent();
+    s.pendingEvent = ev;
+    render();
+    showEvent(ev);
+  }
+
+  function resolveEvent(choiceAccepted){
+    var s = S;
+    var ev = s.pendingEvent;
+    if(!ev) return;
+    var msg='';
+    if(ev.kind==='choice'){
+      if(ev.id==='gigoffer'){
+        var price = Math.round(ASSET_TYPES.business.baseCost*0.6);
+        if(choiceAccepted && s.cash>=price){ buyBusiness(s, price); msg='Invested '+fmt(price)+' in the side gig.'; }
+        else msg = choiceAccepted? 'Not enough cash — offer lapsed.' : 'You passed on the offer.';
+      } else if(ev.id==='landdeal'){
+        var lp = Math.round(ASSET_TYPES.land.baseCost*0.5);
+        if(choiceAccepted && s.cash>=lp){ buyLand(s, lp); msg='Bought discounted land for '+fmt(lp)+'.'; }
+        else msg = choiceAccepted? 'Not enough cash — deal lost.' : 'You passed on the land.';
+      } else if(ev.id==='condodeal'){
+        var full = Math.round(ASSET_TYPES.property.baseCost*0.6);
+        var down = Math.round(full*ASSET_TYPES.property.downPct);
+        if(choiceAccepted && s.cash>=down){ buyProperty(s, {priceOverride:full, downOverride:down}); msg='Bought the discounted apartment.'; }
+        else msg = choiceAccepted? 'Not enough cash for the down payment.' : 'You passed on the apartment.';
+      } else if(ev.id==='landsell'){
+        var landAssets = s.assets.filter(function(a){return a.type==='land';});
+        if(!landAssets.length){ msg='You own no land — offer void.'; }
+        else if(choiceAccepted){
+          var a = landAssets[0];
+          var price = Math.round(a.value*1.8);
+          s.cash += price;
+          s.assets = s.assets.filter(function(x){return x.id!==a.id;});
+          msg = 'Sold land for '+fmt(price)+' — well above market.';
+        } else msg='You held onto the land.';
+      }
+    } else {
+      msg = ev.run(s);
+    }
+    addLog(s, ev.title+': '+msg);
+    s.pendingEvent = null;
+    hideEvent();
+
+    if(isEscaped(s) && s.phase==='ratrace'){ s.phase='escaped'; }
+    render();
+  }
+
+  /* ---------------- rendering ---------------- */
+  function el(html){ var d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+
+  function render(){
+    var s = S;
+    var book = document.getElementById('book');
+    var exp = totalExpenses(s);
+    var inc = passiveIncome(s);
+    var nw = netWorth(s);
+    var pct = Math.min(100, Math.round((inc/Math.max(1,exp))*100));
+    var cashflow = (s.salary+inc) - exp;
+
+    var expenseLines = START.baseExpenses.map(function(e){
+      return '<div class="line-item"><span>'+e.label+'</span><span class="amt num">'+fmt(e.amt)+'</span></div>';
+    }).join('') +
+    s.recurringExpenses.map(function(e){
+      return '<div class="line-item"><span>'+e.label+'</span><span class="amt num">'+fmt(e.amt)+'</span></div>';
+    }).join('') +
+    s.liabilities.map(function(l){
+      return '<div class="line-item"><span>EMI — '+l.name+'</span><span class="amt num">'+fmt(l.emi)+'</span></div>';
+    }).join('');
+
+    var incomeLines = '<div class="line-item"><span>Salary</span><span class="amt num">'+fmt(s.salary)+'</span></div>';
+    var passiveByType = {};
+    s.assets.forEach(function(a){
+      var v = a.type==='stock'? Math.round(a.value*ASSET_TYPES.stock.incomeRate) :
+              a.type==='property'? ASSET_TYPES.property.rent :
+              a.type==='business'? (a._oneOffCut? a.income-a._oneOffCut : a.income) : 0;
+      if(v>0){
+        var label = a.type==='stock'?'Fund dividends':a.type==='property'?'Rental income':'Business income';
+        passiveByType[label] = (passiveByType[label]||0)+v;
+      }
+    });
+    Object.keys(passiveByType).forEach(function(k){
+      incomeLines += '<div class="line-item"><span>'+k+'</span><span class="amt num">'+fmt(passiveByType[k])+'</span></div>';
+    });
+
+    var assetCards = s.assets.length ? s.assets.map(function(a){
+      var incomeStr = a.type==='stock'? fmt(Math.round(a.value*ASSET_TYPES.stock.incomeRate))+'/mo' :
+                       a.type==='property'? fmt(ASSET_TYPES.property.rent)+'/mo rent' :
+                       a.type==='business'? fmt(a.income)+'/mo' : 'no income';
+      return '<div class="asset-card">'+
+        '<div><div class="name">'+a.name+'</div><div class="meta">Value '+fmt(a.value)+' · '+incomeStr+'</div></div>'+
+        '<div class="right"><button class="btn ghost" data-sell="'+a.id+'">Sell</button></div>'+
+      '</div>';
+    }).join('') : '<div class="meta" style="opacity:.7;font-size:12.5px;">No assets yet — the shop below is where freedom starts.</div>';
+
+    var liabCards = s.liabilities.map(function(l){
+      return '<div class="asset-card">'+
+        '<div><div class="name">'+l.name+'</div><div class="meta">Balance '+fmt(l.balance)+' · EMI '+fmt(l.emi)+'/mo</div></div>'+
+        '<div class="right"><button class="btn ghost" data-prepay="'+l.id+'" data-amount="'+Math.min(l.balance,50000)+'">Prepay '+fmt(Math.min(l.balance,50000))+'</button></div>'+
+      '</div>';
+    }).join('');
+
+    var canBiz = s.businessesBought<4;
+    var bizCost = ASSET_TYPES.business.baseCost + s.businessesBought*ASSET_TYPES.business.costStep;
+
+    var shop =
+      '<div class="shop-grid">'+
+        '<div class="shop-card"><div class="title">'+ASSET_TYPES.stock.label+'</div><div class="desc">'+ASSET_TYPES.stock.desc+'</div><div class="price num">'+fmt(ASSET_TYPES.stock.baseCost)+'</div><button class="btn brass" id="buyStock" '+(s.cash<ASSET_TYPES.stock.baseCost?'disabled':'')+'>Buy lot</button></div>'+
+        '<div class="shop-card"><div class="title">'+ASSET_TYPES.land.label+'</div><div class="desc">'+ASSET_TYPES.land.desc+'</div><div class="price num">'+fmt(ASSET_TYPES.land.baseCost)+'</div><button class="btn brass" id="buyLand" '+(s.cash<ASSET_TYPES.land.baseCost?'disabled':'')+'>Buy parcel</button></div>'+
+        '<div class="shop-card"><div class="title">'+ASSET_TYPES.property.label+'</div><div class="desc">'+ASSET_TYPES.property.desc+'</div><div class="price num">'+fmt(Math.round(ASSET_TYPES.property.baseCost*ASSET_TYPES.property.downPct))+' down</div><button class="btn brass" id="buyProperty" '+(s.cash<Math.round(ASSET_TYPES.property.baseCost*ASSET_TYPES.property.downPct)?'disabled':'')+'>Buy on loan</button></div>'+
+        '<div class="shop-card"><div class="title">'+ASSET_TYPES.business.label+' #'+(s.businessesBought+1)+'</div><div class="desc">'+ASSET_TYPES.business.desc+'</div><div class="price num">'+fmt(bizCost)+'</div><button class="btn brass" id="buyBiz" '+((!canBiz||s.cash<bizCost)?'disabled':'')+'>'+(canBiz?'Start business':'Max reached')+'</button></div>'+
+      '</div>';
+
+    var chart = renderChart(s.history);
+
+    var logHtml = s.log.map(function(l){
+      return '<div class="entry"><span class="t num">'+l.t+'</span><span>'+l.text+'</span></div>';
+    }).join('');
+
+    if(s.phase==='ended'){
+      book.innerHTML = renderEnd(s);
+      wireEnd();
+      return;
+    }
+
+    book.innerHTML =
+      '<div class="statusbar">'+
+        '<span class="phase-badge '+(s.phase==='escaped'?'escaped':'')+'">'+(s.phase==='escaped'?'Rat race escaped':'Rat race')+'</span>'+
+        '<span class="turn-counter">Month '+s.turn+'</span>'+
+      '</div>'+
+
+      '<div class="meter-row">'+
+        '<div class="meter"><div class="label">Cash on hand</div><div class="value num">'+fmt(s.cash)+'</div></div>'+
+        '<div class="meter"><div class="label">Net worth</div><div class="value num">'+fmt(nw)+'</div></div>'+
+        '<div class="meter"><div class="label">Monthly cashflow</div><div class="value num '+(cashflow>=0?'good':'bad')+'">'+(cashflow>=0?'+':'')+fmt(cashflow)+'</div></div>'+
+      '</div>'+
+
+      '<div class="freedom-track">'+
+        '<div class="label"><span>Passive income '+fmt(inc)+'</span><span>Expenses '+fmt(exp)+'</span></div>'+
+        '<div class="freedom-bar"><div class="freedom-fill" style="width:'+pct+'%"></div></div>'+
+      '</div>'+
+
+      '<div class="ledger-columns">'+
+        '<div class="ledger-col"><h3>Income / mo</h3>'+incomeLines+'<div class="line-item total"><span>Total</span><span class="num">'+fmt(s.salary+inc)+'</span></div></div>'+
+        '<div class="ledger-col"><h3>Expenses / mo</h3>'+expenseLines+'<div class="line-item total"><span>Total</span><span class="num">'+fmt(exp)+'</span></div></div>'+
+      '</div>'+
+
+      '<section class="panel"><h3>Assets</h3><div class="asset-grid">'+assetCards+'</div></section>'+
+
+      (s.liabilities.length? '<section class="panel"><h3>Liabilities</h3><div class="asset-grid">'+liabCards+'</div></section>' : '')+
+
+      '<section class="panel"><h3>Investment desk</h3>'+shop+'</section>'+
+
+      '<section class="panel"><h3>Net worth over time</h3><div class="chart-wrap">'+chart+'</div></section>'+
+
+      '<section class="panel"><h3>Passbook history</h3><div class="log-list">'+logHtml+'</div></section>'+
+
+      '<div class="next-btn-wrap"><button class="btn big" id="nextMonth">Advance to next month →</button></div>';
+
+    wireBook();
+  }
+
+  function renderChart(history){
+    var w=760, h=110, pad=8;
+    var min=Math.min.apply(null,history), max=Math.max.apply(null,history);
+    if(min===max){ min-=1; max+=1; }
+    var n=history.length;
+    var pts = history.map(function(v,i){
+      var x = pad + (n<=1?0:(i/(n-1))*(w-2*pad));
+      var y = h-pad - ((v-min)/(max-min))*(h-2*pad);
+      return x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+    var zeroY = h-pad - ((0-min)/(max-min))*(h-2*pad);
+    var zeroLine = (min<0 && max>0) ? '<line x1="'+pad+'" y1="'+zeroY.toFixed(1)+'" x2="'+(w-pad)+'" y2="'+zeroY.toFixed(1)+'" stroke="var(--ink-dim)" stroke-dasharray="3,3" stroke-width="1"/>' : '';
+    var lastPt = pts.split(' ').pop().split(',');
+    return '<svg class="chart" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
+      zeroLine+
+      '<polyline points="'+pts+'" fill="none" stroke="var(--brass)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+      '<circle cx="'+lastPt[0]+'" cy="'+lastPt[1]+'" r="4" fill="var(--brass-bright)"/>'+
+    '</svg>';
+  }
+
+  function renderEnd(s){
+    var months = s.turn;
+    var nw = netWorth(s);
+    return '<div class="end-screen">'+
+      '<div class="headline display">You escaped the rat race</div>'+
+      '<p>It took '+months+' months of trade-offs, a few bad breaks, and assets that finally paid you back.</p>'+
+      '<div class="end-stats">'+
+        '<div class="meter"><div class="label">Months played</div><div class="value num">'+months+'</div></div>'+
+        '<div class="meter"><div class="label">Net worth</div><div class="value num good">'+fmt(nw)+'</div></div>'+
+        '<div class="meter"><div class="label">Passive income</div><div class="value num good">'+fmt(passiveIncome(s))+'/mo</div></div>'+
+      '</div>'+
+      '<p style="margin-top:-6px;">The lesson underneath the game: a salary pays your bills, assets pay <em>you</em>. The gap between those two is the only freedom that compounds.</p>'+
+      '<button class="btn big brass" id="restart">Play again</button>'+
+    '</div>';
+  }
+
+  function wireEnd(){
+    var r = document.getElementById('restart');
+    if(r) r.onclick = function(){ S = newGame(); render(); };
+  }
+
+  function wireBook(){
+    var s = S;
+    var nb = document.getElementById('nextMonth'); if(nb) nb.onclick = nextMonth;
+    var bs = document.getElementById('buyStock'); if(bs) bs.onclick=function(){ buyStock(s); };
+    var bl = document.getElementById('buyLand'); if(bl) bl.onclick=function(){ buyLand(s); };
+    var bp = document.getElementById('buyProperty'); if(bp) bp.onclick=function(){ buyProperty(s); };
+    var bb = document.getElementById('buyBiz'); if(bb) bb.onclick=function(){ buyBusiness(s); };
+    document.querySelectorAll('[data-sell]').forEach(function(btn){
+      btn.onclick=function(){ sellAsset(s, btn.getAttribute('data-sell')); };
+    });
+    document.querySelectorAll('[data-prepay]').forEach(function(btn){
+      btn.onclick=function(){ prepayLoan(s, btn.getAttribute('data-prepay'), parseInt(btn.getAttribute('data-amount'),10)); };
+    });
+
+    if(s.phase==='escaped' && !s._celebrated){
+      s._celebrated = true;
+      s.phase='ended';
+      render();
+    }
+  }
+
+  function showEvent(ev){
+    var overlay = document.getElementById('overlay');
+    var card = document.getElementById('eventCard');
+    var isPos = ev.kind==='pos';
+    var isChoice = ev.kind==='choice';
+    var stampClass = isPos? 'pos' : (isChoice? 'pos':'');
+    var actions = isChoice ?
+      '<div class="event-actions"><button class="btn brass" id="evAccept">Take the deal</button><button class="btn ghost" id="evDecline">Pass</button></div>' :
+      '<div class="event-actions"><button class="btn big" id="evOk">Acknowledge</button></div>';
+
+    card.innerHTML =
+      '<div class="stamp '+stampClass+'">'+ev.stamp+'</div>'+
+      '<h2>'+ev.title+'</h2>'+
+      '<p>'+ev.text+'</p>'+
+      (isChoice? '' : '<div class="effect" id="evEffect"></div>')+
+      actions;
+
+    overlay.hidden = false;
+
+    if(!isChoice){
+      var msg = ev.run(S);
+      document.getElementById('evEffect').textContent = msg;
+      S.pendingEvent = { title: ev.title, id: ev.id, kind: ev.kind, applied: msg };
+      document.getElementById('evOk').onclick = function(){
+        addLog(S, ev.title+': '+msg);
+        S.pendingEvent = null;
+        hideEvent();
+        if(isEscaped(S) && S.phase==='ratrace'){ S.phase='escaped'; }
+        render();
+      };
+    } else {
+      S.pendingEvent = ev;
+      document.getElementById('evAccept').onclick = function(){ resolveEvent(true); };
+      document.getElementById('evDecline').onclick = function(){ resolveEvent(false); };
+    }
+  }
+
+  function hideEvent(){
+    document.getElementById('overlay').hidden = true;
+  }
+
+  /* ---------------- boot (with hot-reload state carry) ---------------- */
+  function start(saved){
+    S = (saved && saved.turn) ? saved : newGame();
+    render();
+  }
+
+  try{
+    if(window.claude && window.claude.hot){
+      window.claude.hot.snapshot(function(){ return S; });
+      window.claude.hot.ready ? window.claude.hot.ready(start) : start(window.claude.hot.data);
+    } else {
+      start();
+    }
+  } catch(e){ start(); }
+
+})();
+</script>

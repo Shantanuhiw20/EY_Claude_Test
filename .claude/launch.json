@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ey-fin-os-dev",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set PATH=C:\\PROGRA~1\\nodejs;C:\\Users\\Lab6\\AppData\\Roaming\\npm;%PATH% && cd /d ey-fin-os && C:\\PROGRA~1\\nodejs\\npm.cmd run dev"],
+      "port": 3000
+    }
+  ]
+}
